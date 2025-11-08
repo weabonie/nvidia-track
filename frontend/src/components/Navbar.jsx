@@ -4,35 +4,35 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <nav className="bg-gray-900 text-white shadow-lg">
+    <nav className="bg-black text-white border-b border-gray-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+        <div className="flex justify-between items-center h-20">
           {/* Logo */}
           <div className="flex-shrink-0">
-            <a href="/" className="text-2xl font-bold text-green-400 hover:text-green-300 transition-colors">
+            <a href="/" className="text-2xl font-bold tracking-tight hover:text-gray-300 transition-colors">
               NVIDIA Track
             </a>
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex space-x-8">
-            <a href="#home" className="hover:text-green-400 transition-colors">
+          <div className="hidden md:flex space-x-10">
+            <a href="#home" className="text-sm font-medium hover:text-gray-300 transition-colors uppercase tracking-wide">
               Home
             </a>
-            <a href="#features" className="hover:text-green-400 transition-colors">
+            <a href="#features" className="text-sm font-medium hover:text-gray-300 transition-colors uppercase tracking-wide">
               Features
             </a>
-            <a href="#about" className="hover:text-green-400 transition-colors">
+            <a href="#about" className="text-sm font-medium hover:text-gray-300 transition-colors uppercase tracking-wide">
               About
             </a>
-            <a href="#contact" className="hover:text-green-400 transition-colors">
+            <a href="#contact" className="text-sm font-medium hover:text-gray-300 transition-colors uppercase tracking-wide">
               Contact
             </a>
           </div>
 
           {/* CTA Button */}
           <div className="hidden md:block">
-            <button className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg font-semibold transition-colors">
+            <button className="bg-white text-black px-8 py-2.5 rounded-lg font-semibold hover:bg-gray-200 transition-all transform hover:scale-105">
               Get Started
             </button>
           </div>
@@ -41,10 +41,10 @@ const Navbar = () => {
           <div className="md:hidden">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-gray-300 hover:text-white focus:outline-none"
+              className="text-white hover:text-gray-300 focus:outline-none"
             >
               <svg
-                className="h-6 w-6"
+                className="h-7 w-7"
                 fill="none"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -64,21 +64,21 @@ const Navbar = () => {
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden pb-4">
-            <div className="flex flex-col space-y-3">
-              <a href="#home" className="hover:text-green-400 transition-colors">
+          <div className="md:hidden pb-6 pt-2 border-t border-gray-800">
+            <div className="flex flex-col space-y-4">
+              <a href="#home" className="text-sm font-medium hover:text-gray-300 transition-colors uppercase tracking-wide">
                 Home
               </a>
-              <a href="#features" className="hover:text-green-400 transition-colors">
+              <a href="#features" className="text-sm font-medium hover:text-gray-300 transition-colors uppercase tracking-wide">
                 Features
               </a>
-              <a href="#about" className="hover:text-green-400 transition-colors">
+              <a href="#about" className="text-sm font-medium hover:text-gray-300 transition-colors uppercase tracking-wide">
                 About
               </a>
-              <a href="#contact" className="hover:text-green-400 transition-colors">
+              <a href="#contact" className="text-sm font-medium hover:text-gray-300 transition-colors uppercase tracking-wide">
                 Contact
               </a>
-              <button className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg font-semibold transition-colors w-full">
+              <button className="bg-white text-black px-6 py-2.5 rounded-lg font-semibold hover:bg-gray-200 transition-all w-full mt-2">
                 Get Started
               </button>
             </div>

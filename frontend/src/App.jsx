@@ -32,10 +32,10 @@ const router = createBrowserRouter([
     ],
   },
   // You can add other top-level routes without the main layout here if needed
-  // {
-  //   path: '/login',
-  //   element: <LoginPage />,
-  // },
+  {
+    path: '/login',
+    element: <LoginPage />,
+  },
 ]);
 
 function App({ routes }) {

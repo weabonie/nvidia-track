@@ -1,0 +1,228 @@
+{
+  "project_name": "MyAPI Service",
+  "description": "A REST API service for managing user data with authentication and real-time notifications. Built for developers who need a scalable, production-ready backend for web and mobile applications. Includes role-based access control and extensive logging.",
+  "repo_url": "https://github.com/example/myapi",
+  "tech_stack": [
+    "Python 3.11",
+    "FastAPI 0.104",
+    "PostgreSQL 15",
+    "Redis 7",
+    "Docker 24",
+    "Pydantic 2.0"
+  ],
+  "setup": {
+    "os_constraints": [
+      "Linux (Ubuntu 22.04+)",
+      "macOS 12+",
+      "Windows 10+ with WSL2"
+    ],
+    "tools": [
+      "Python 3.11+",
+      "Docker 24+",
+      "Docker Compose 2.0+",
+      "PostgreSQL 15+ (or via Docker)",
+      "Redis 7+ (or via Docker)"
+    ],
+    "hardware": [
+      "2GB+ RAM",
+      "10GB disk space",
+      "Network access for package downloads"
+    ]
+  },
+  "env_variables": [
+    {
+      "name": "DATABASE_URL",
+      "purpose": "PostgreSQL connection string (postgres://user:pass@host:port/db)",
+      "required": true
+    },
+    {
+      "name": "REDIS_URL",
+      "purpose": "Redis connection string for caching and sessions",
+      "required": true
+    },
+    {
+      "name": "SECRET_KEY",
+      "purpose": "JWT token signing key (use strong random value)",
+      "required": true
+    },
+    {
+      "name": "API_HOST",
+      "purpose": "Host to bind API server (default: 0.0.0.0)",
+      "required": false,
+      "default": "0.0.0.0"
+    },
+    {
+      "name": "API_PORT",
+      "purpose": "Port for API server (default: 8000)",
+      "required": false,
+      "default": "8000"
+    },
+    {
+      "name": "LOG_LEVEL",
+      "purpose": "Logging level (DEBUG, INFO, WARNING, ERROR)",
+      "required": false,
+      "default": "INFO"
+    }
+  ],
+  "apis": [
+    {
+      "name": "Get User",
+      "path": "/api/v1/users/{id}",
+      "method": "GET",
+      "purpose": "Retrieve a user by ID",
+      "request_shape": {},
+      "response_shape": {
+        "id": "string (uuid)",
+        "name": "string",
+        "email": "string",
+        "role": "string",
+        "created_at": "datetime"
+      },
+      "auth_required": true
+    },
+    {
+      "name": "Create User",
+      "path": "/api/v1/users",
+      "method": "POST",
+      "purpose": "Create a new user account",
+      "request_shape": {
+        "name": "string (required)",
+        "email": "string (required, unique)",
+        "password": "string (required, min 8 chars)",
+        "role": "string (optional, default: user)"
+      },
+      "response_shape": {
+        "id": "string (uuid)",
+        "name": "string",
+        "email": "string",
+        "role": "string"
+      },
+      "auth_required": false
+    },
+    {
+      "name": "Update User",
+      "path": "/api/v1/users/{id}",
+      "method": "PUT",
+      "purpose": "Update user information",
+      "request_shape": {
+        "name": "string (optional)",
+        "email": "string (optional)",
+        "role": "string (optional, admin only)"
+      },
+      "response_shape": {
+        "id": "string (uuid)",
+        "name": "string",
+        "email": "string",
+        "role": "string"
+      },
+      "auth_required": true
+    },
+    {
+      "name": "Delete User",
+      "path": "/api/v1/users/{id}",
+      "method": "DELETE",
+      "purpose": "Delete a user account (admin only)",
+      "request_shape": {},
+      "response_shape": {
+        "success": "boolean",
+        "message": "string"
+      },
+      "auth_required": true
+    },
+    {
+      "name": "Login",
+      "path": "/api/v1/auth/login",
+      "method": "POST",
+      "purpose": "Authenticate and receive JWT token",
+      "request_shape": {
+        "email": "string (required)",
+        "password": "string (required)"
+      },
+      "response_shape": {
+        "access_token": "string (JWT)",
+        "token_type": "string",
+        "expires_in": "integer (seconds)"
+      },
+      "auth_required": false
+    }
+  ],
+  "modules": [
+    {
+      "name": "Authentication Service",
+      "path": "src/auth/",
+      "summary": "Handles user authentication, JWT token generation and validation, and session management. Supports password-based authentication with bcrypt hashing and role-based access control.",
+      "dependencies": []
+    },
+    {
+      "name": "User Service",
+      "path": "src/users/",
+      "summary": "Manages user CRUD operations, profile updates, and user search functionality. Integrates with the authentication service for access control and validates all user input.",
+      "dependencies": ["Authentication Service"]
+    },
+    {
+      "name": "Database Layer",
+      "path": "src/database/",
+      "summary": "Provides PostgreSQL connection pooling, migration management with Alembic, and ORM models using SQLAlchemy. Handles all database interactions with proper transaction management.",
+      "dependencies": []
+    },
+    {
+      "name": "Cache Layer",
+      "path": "src/cache/",
+      "summary": "Redis-based caching for frequently accessed data, session storage, and rate limiting. Provides automatic cache invalidation and TTL management.",
+      "dependencies": ["Database Layer"]
+    }
+  ],
+  "deployment": [
+    {
+      "platform": "Docker",
+      "description": "Single container deployment using Docker Compose with PostgreSQL and Redis services",
+      "config_files": [
+        "Dockerfile",
+        "docker-compose.yml",
+        ".dockerignore"
+      ]
+    },
+    {
+      "platform": "Kubernetes",
+      "description": "Production deployment with Helm charts including autoscaling, health checks, and secrets management",
+      "config_files": [
+        "k8s/deployment.yaml",
+        "k8s/service.yaml",
+        "k8s/ingress.yaml",
+        "helm/values.yaml"
+      ]
+    }
+  ],
+  "faq": [
+    {
+      "question": "How do I reset my database?",
+      "answer": "Run 'docker-compose down -v' to remove volumes, then 'docker-compose up -d' to recreate with a fresh database. For production, use Alembic migrations instead.",
+      "category": "Troubleshooting"
+    },
+    {
+      "question": "Why am I getting 'Connection refused' errors?",
+      "answer": "Ensure PostgreSQL and Redis are running. Check that DATABASE_URL and REDIS_URL environment variables point to reachable services. In Docker, use service names (postgres, redis) not localhost.",
+      "category": "Troubleshooting"
+    },
+    {
+      "question": "How do I create an admin user?",
+      "answer": "Use the CLI command 'python -m src.cli create-admin --email admin@example.com --password yourpassword' or set the role field to 'admin' when creating a user via the API with an existing admin account.",
+      "category": "Configuration"
+    },
+    {
+      "question": "What's the recommended SECRET_KEY format?",
+      "answer": "Generate a secure random key with 'openssl rand -hex 32'. Never commit this to version control. Use different keys for development and production.",
+      "category": "Configuration"
+    },
+    {
+      "question": "How do I enable debug logging?",
+      "answer": "Set LOG_LEVEL=DEBUG in your environment variables. For production, use INFO or WARNING to reduce log volume.",
+      "category": "Configuration"
+    }
+  ],
+  "extras": {
+    "openapi_spec": "docs/openapi.yaml",
+    "architecture_diagram": "https://example.com/myapi-architecture.png",
+    "postman_collection": "docs/MyAPI.postman_collection.json"
+  }
+}

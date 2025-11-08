@@ -8,8 +8,8 @@ function App() {
 
   return (
     <>
-      <div>
-        <p className="text-3xl text-red-600">local</p>
+      <div className=''>
+        <p className="text-3xl text-red-600">Copilot Helper</p>
       </div>
       
     </>

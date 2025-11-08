@@ -7,7 +7,7 @@ const Footer = () => {
           <div className="col-span-1 md:col-span-2">
             <h3 className="text-3xl font-bold text-white mb-4 tracking-tight">NVIDIA Track</h3>
             <p className="text-gray-500 mb-6 leading-relaxed max-w-md">
-              Empowering developers with cutting-edge GPU tracking and monitoring solutions.
+              Empowering developers with cutting-edge agentic solutions.
             </p>
             <div className="flex space-x-5">
               <a href="#" className="hover:text-white transition-colors transform hover:scale-110">

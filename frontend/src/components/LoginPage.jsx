@@ -1,4 +1,4 @@
-const LoginForm = () => {
+const LoginPage = () => {
     return (
         <div className={cn("flex flex-col")}>
             

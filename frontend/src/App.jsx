@@ -8,6 +8,8 @@ import {
 
 import Home from "./pages/Home";
 import Layout from './Layout'
+import LoginPage from './pages/LoginPage'
+
 // import Login from './pages/auth/Login';
 // import Register from './pages/auth/Register';
 // import Header from './components/nav/Header';

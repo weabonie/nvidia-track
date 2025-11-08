@@ -1,19 +1,49 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React from "react";
+import {
+  Route,
+  createBrowserRouter,
+  createRoutesFromElements,
+  RouterProvider,
+} from "react-router-dom";
 
-function App() {
-  const [count, setCount] = useState(0)
+import Home from "./pages/Home";
+import Layout from './Layout'
+// import Login from './pages/auth/Login';
+// import Register from './pages/auth/Register';
+// import Header from './components/nav/Header';
 
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Layout />,
+    children: [
+      {
+        index: true, // This makes Home the default child route for '/'
+        element: <Home />,
+      },
+      // {
+      //   path: 'about',
+      //   element: <About />,
+      // },
+      // {
+      //   path: 'contact',
+      //   element: <Contact />,
+      // },
+    ],
+  },
+  // You can add other top-level routes without the main layout here if needed
+  // {
+  //   path: '/login',
+  //   element: <LoginPage />,
+  // },
+]);
+
+function App({ routes }) {
   return (
     <>
-      <div className=''>
-        <p className="text-3xl text-red-600">Copilot Helper</p>
-      </div>
-      
+      <RouterProvider router={router} />
     </>
-  )
+  );
 }
 
-export default App
+export default App;

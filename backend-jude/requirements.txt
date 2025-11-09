@@ -3,6 +3,7 @@ sentence-transformers
 langchain-text-splitters
 langchain-ollama
 flask
+flask-cors
 langchain-openai
 langchain-community
 langchain-core

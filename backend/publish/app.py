@@ -77,14 +77,17 @@ CRITICAL RULES:
 5. ABSOLUTELY NO SPECIAL CHARACTERS for placeholders - MDX/React interprets them as code
    - For API paths with parameters, use UPPERCASE: /api/users/USER_ID or /api/users/USERID
    - For placeholders: use UPPERCASE_WORDS like PROJECT_ID, USER_NAME, etc.
-   - NEVER use: {}, <>, :, or any symbols - ONLY letters, numbers, underscore, hyphen
+   - NEVER use: {}, <>, :, or any symbols OUTSIDE code blocks - ONLY letters, numbers, underscore, hyphen
 6. CODE BLOCKS: CRITICAL FORMATTING
    - Use EXACTLY three backticks (```) at start of code block on its own line
-   - NEVER write "code```" or put ANY text before the backticks
+   - NEVER write "code```" or "Example:```" or put ANY text before the backticks
+   - Put backticks on their OWN line: text here, then newline, then ```
    - Format: ```language on one line, then code, then ``` on its own line
    - Always close code blocks properly with three backticks on their own line
-7. Never use malformed code fences
-8. Keep it simple - use plain text and UPPERCASE for placeholders
+   - Inside code blocks, write COMPLETE, VALID code - no incomplete JSX attributes
+   - If showing JSX/React: use COMPLETE props like data={{}} or options={{}} not data= or options=
+7. Never use malformed code fences or incomplete code examples
+8. Keep it simple - use plain text and UPPERCASE for placeholders OUTSIDE code blocks
 
 JSON SCHEMA (FOLLOW EXACTLY):
 {
@@ -172,6 +175,7 @@ def write_minimal_docusaurus(site_dir: Path, site_title: str, site_base_url: str
     (site_dir / "docs").mkdir(parents=True, exist_ok=True)
     (site_dir / "static").mkdir(parents=True, exist_ok=True)
     (site_dir / "src").mkdir(parents=True, exist_ok=True)
+    (site_dir / "src" / "css").mkdir(parents=True, exist_ok=True)
 
     (site_dir / "package.json").write_text(json.dumps({
         "name": site_title.lower().replace(" ", "-"),
@@ -184,14 +188,17 @@ def write_minimal_docusaurus(site_dir: Path, site_title: str, site_base_url: str
         "dependencies": {
             "@docusaurus/core": "3.5.2",
             "@docusaurus/preset-classic": "3.5.2",
+            "prism-react-renderer": "^2.3.0",
             "react": "^18.2.0",
             "react-dom": "^18.2.0"
         }
     }, indent=2), encoding="utf-8")
 
     (site_dir / "docusaurus.config.js").write_text(f"""\
+import {{themes as prismThemes}} from 'prism-react-renderer';
+
 /** @type {{import('@docusaurus/types').Config}} */
-export default {{
+const config = {{
   title: '{site_title}',
   url: 'https://{site_base_url}',
   baseUrl: '/',
@@ -200,26 +207,125 @@ export default {{
   favicon: 'img/favicon.ico',
   organizationName: 'docs', 
   projectName: '{site_title}',
+  
   presets: [
     [
       'classic',
-      {{
+      /** @type {{import('@docusaurus/preset-classic').Options}} */
+      ({{
         docs: {{
           routeBasePath: '/',
           sidebarPath: './sidebars.js',
         }},
         blog: false,
-        theme: {{}}
-      }}
-    ]
+        theme: {{
+          customCss: './src/css/custom.css',
+        }},
+      }}),
+    ],
   ],
-  themeConfig: {{
-    navbar: {{
-      title: '{site_title}',
-      items: []
-    }}
-  }}
+
+  themeConfig:
+    /** @type {{import('@docusaurus/preset-classic').ThemeConfig}} */
+    ({{
+      colorMode: {{
+        defaultMode: 'dark',
+        respectPrefersColorScheme: true,
+      }},
+      navbar: {{
+        title: '{site_title}',
+        items: [],
+      }},
+      prism: {{
+        theme: prismThemes.github,
+        darkTheme: prismThemes.dracula,
+      }},
+    }}),
 }};
+
+export default config;
+""", encoding="utf-8")
+
+    # Create custom NVIDIA green theme CSS
+    (site_dir / "src" / "css" / "custom.css").write_text("""/**
+ * NVIDIA Green Theme for Docusaurus
+ * Primary color: #76B900 (NVIDIA Green)
+ */
+
+:root {
+  /* NVIDIA Green color palette */
+  --ifm-color-primary: #76B900;
+  --ifm-color-primary-dark: #6aa600;
+  --ifm-color-primary-darker: #649d00;
+  --ifm-color-primary-darkest: #528100;
+  --ifm-color-primary-light: #82cc00;
+  --ifm-color-primary-lighter: #88d500;
+  --ifm-color-primary-lightest: #9ee116;
+  
+  /* Code block background */
+  --ifm-code-font-size: 95%;
+  
+  /* Link colors */
+  --ifm-link-color: #76B900;
+  --ifm-link-hover-color: #6aa600;
+}
+
+/* Dark mode adjustments */
+[data-theme='dark'] {
+  --ifm-color-primary: #82cc00;
+  --ifm-color-primary-dark: #76b900;
+  --ifm-color-primary-darker: #6aa600;
+  --ifm-color-primary-darkest: #5e9300;
+  --ifm-color-primary-light: #88d500;
+  --ifm-color-primary-lighter: #9ee116;
+  --ifm-color-primary-lightest: #a8e62c;
+  
+  --ifm-link-color: #82cc00;
+  --ifm-link-hover-color: #9ee116;
+}
+
+/* Navbar styling */
+.navbar {
+  background-color: #1a1a1a;
+  border-bottom: 2px solid #76B900;
+}
+
+.navbar__title {
+  color: #76B900 !important;
+  font-weight: 600;
+}
+
+/* Sidebar active item */
+.menu__link--active {
+  background-color: rgba(118, 185, 0, 0.1);
+  border-left: 3px solid #76B900;
+}
+
+/* Code blocks with NVIDIA accent */
+.prism-code {
+  border-left: 3px solid #76B900;
+}
+
+/* Buttons and interactive elements */
+.button--primary {
+  background-color: #76B900;
+  border-color: #76B900;
+}
+
+.button--primary:hover {
+  background-color: #6aa600;
+  border-color: #6aa600;
+}
+
+/* Headings accent */
+h1, h2, h3, h4, h5, h6 {
+  color: inherit;
+}
+
+article h1 {
+  border-bottom: 3px solid #76B900;
+  padding-bottom: 0.5rem;
+}
 """, encoding="utf-8")
 
     # Build sidebar from pages input
@@ -241,10 +347,11 @@ export default {{
 def fix_mdx_curly_braces(content: str) -> str:
     """
     SANITIZE MDX content to prevent React/JSX parsing errors.
-    - Remove ALL curly braces (MDX treats them as JS expressions)
-    - Replace angle brackets that look like HTML tags
+    - Remove problematic curly braces OUTSIDE code blocks (MDX treats them as JS expressions)
+    - Replace angle brackets that look like HTML/JSX tags OUTSIDE code blocks
     - Replace :param syntax with safe UPPERCASE
-    - Preserves code blocks and frontmatter.
+    - Fix malformed code fences
+    - Preserves code blocks and frontmatter completely unchanged.
     """
     lines = content.split('\n')
     result = []
@@ -272,6 +379,12 @@ def fix_mdx_curly_braces(content: str) -> str:
             line = stripped.replace('code```', '```')
             stripped = line.strip()
         
+        # CRITICAL: Fix "Example:```" or any "text```" pattern
+        if re.search(r'\w```', stripped):
+            logger.warning(f"Line {i+1}: Found text immediately before ```, fixing")
+            line = re.sub(r'(\w)(```)', r'\1\n\2', line)
+            stripped = line.strip()
+        
         if stripped.startswith('``') and not stripped.startswith('```'):
             # Likely a malformed code fence like ``' or ``
             logger.warning(f"Line {i+1}: Found malformed code fence '{stripped}', fixing to '```'")
@@ -284,24 +397,47 @@ def fix_mdx_curly_braces(content: str) -> str:
             result.append(line)
             continue
         
-        # Don't modify code blocks or frontmatter
+        # Don't modify code blocks or frontmatter - preserve them EXACTLY
         if in_code_block or in_frontmatter:
             result.append(line)
             continue
 
-        # CRITICAL: Remove ALL curly braces - both matched pairs AND orphaned ones
-        # First remove matched pairs {anything}
-        modified_line = re.sub(r"\{\s*[^}]*\s*\}", "", line)
-        # Then remove any remaining orphaned { or } characters
+        # Only modify text OUTSIDE code blocks
+        modified_line = line
+        
+        # Remove curly braces that are NOT in inline code (backticks)
+        # Strategy: protect inline code, then remove braces, then restore inline code
+        inline_code_parts = []
+        def save_inline_code(match):
+            inline_code_parts.append(match.group(0))
+            return f"__INLINE_CODE_{len(inline_code_parts)-1}__"
+        
+        # Protect inline code
+        modified_line = re.sub(r'`[^`]+`', save_inline_code, modified_line)
+        
+        # Now remove curly braces (both matched pairs AND orphaned ones)
+        modified_line = re.sub(r"\{[^}]*\}", "", modified_line)
         modified_line = modified_line.replace('{', '').replace('}', '')
+        
+        # Restore inline code
+        for idx, code in enumerate(inline_code_parts):
+            modified_line = modified_line.replace(f"__INLINE_CODE_{idx}__", code)
 
-        # Replace :param patterns with PARAM name (drop the colon)
-        # Match patterns like :id, :userId, :projectId etc
+        # Replace :param patterns with PARAM name (drop the colon) - OUTSIDE inline code
+        inline_code_parts = []
+        modified_line = re.sub(r'`[^`]+`', save_inline_code, modified_line)
         modified_line = re.sub(r':([a-zA-Z_][a-zA-Z0-9_]*)', r'\1', modified_line)
+        for idx, code in enumerate(inline_code_parts):
+            modified_line = modified_line.replace(f"__INLINE_CODE_{idx}__", code)
 
         # Replace <placeholder> patterns with PLACEHOLDER (MDX thinks these are HTML tags!)
-        # Match patterns like <user-id>, <id>, etc
+        # But NOT in inline code or if it looks like a real HTML tag
+        inline_code_parts = []
+        modified_line = re.sub(r'`[^`]+`', save_inline_code, modified_line)
+        # Only replace simple placeholders, not complex HTML-like tags
         modified_line = re.sub(r'<([a-zA-Z][a-zA-Z0-9_-]*)>', r'\1', modified_line)
+        for idx, code in enumerate(inline_code_parts):
+            modified_line = modified_line.replace(f"__INLINE_CODE_{idx}__", code)
 
         result.append(modified_line)
     

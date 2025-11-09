@@ -7,8 +7,19 @@ const Home = () => {
       <div className="relative bg-black border-b border-gray-800 py-32 md:py-40 w-full min-h-[calc(100vh-5rem)] flex items-center justify-center overflow-hidden">
         {/* NVIDIA-style geometric background */}
         <div className="absolute inset-0">
-          {/* Dark gradient base with green accent */}
-          <div className="absolute inset-0 bg-gradient-to-br from-[#76B900]/2 via-black to-[#5d9100]/2"></div>
+          {/* NVIDIA Background Image */}
+          <div 
+            className="absolute inset-0 opacity-25"
+            style={{
+              backgroundImage: "url('https://images.unsplash.com/photo-1591488320449-011701bb6704?q=80&w=2070&auto=format&fit=crop')",
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
+            }}
+          ></div>
+          
+          {/* Dark gradient overlay to blend with image */}
+          <div className="absolute inset-0 bg-gradient-to-br from-[#76B900]/20 via-black/70 to-[#5d9100]/20"></div>
           
           {/* Additional green gradient overlay */}
           <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-[#76B900]/5 to-transparent"></div>

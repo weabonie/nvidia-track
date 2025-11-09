@@ -1,4 +1,6 @@
 import * as React from "react"
+import { useEffect, useMemo, useState } from "react"
+import axios from "axios"
 import { useNavigate } from "react-router-dom"
 
 import {
@@ -13,20 +15,50 @@ import {
 
 import { Button } from "./ui/button"
 
-const ProjectCard = ({ projectName }) => {
-  const project = {
-    name: projectName,
-    description: "No description provided",
-    updatedAt: "—",
-    link: "#",
-    tech: [],
-    visibility: "private",
-  }
-
+// ProjectCard can accept either a projectName string or a project object
+const ProjectCard = ({ projectName, project }) => {
   const navigate = useNavigate()
 
+  // Derive display name from provided props
+  const displayName = useMemo(() => (projectName || project?.name || "Untitled Project"), [projectName, project])
+
+  // Slugs for API and routing
+  const apiName = useMemo(() => displayName.trim().toLowerCase().replace(/\s+/g, ""), [displayName]) // remove spaces for API (e.g., "UH Events" -> "uhevents")
+  const routeSlug = useMemo(() => displayName.trim().toLowerCase().replace(/\s+/g, "-"), [displayName])
+
+  // Local state for fetched repo info
+  const [details, setDetails] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
+
+  useEffect(() => {
+    let cancelled = false
+    const controller = new AbortController()
+    const fetchDetails = async () => {
+      if (!apiName) return
+      try {
+        setLoading(true)
+        setError(null)
+        const resp = await axios.get("https://apihackutd.siru.dev/repo", {
+          params: { name: apiName },
+          signal: controller.signal,
+        })
+        if (!cancelled) setDetails(resp.data)
+      } catch (e) {
+        if (!cancelled) setError(e?.message || "Failed to load repo info")
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    }
+    fetchDetails()
+    return () => {
+      cancelled = true
+      try { controller.abort() } catch {}
+    }
+  }, [apiName])
+
   const handleNavigate = () => {
-    const id = project.id ?? name.replace(/\s+/g, "-").toLowerCase()
+    const id = project?.id ?? routeSlug
     navigate(`/dashboard/projects/${id}`)
   }
 
@@ -47,14 +79,19 @@ const ProjectCard = ({ projectName }) => {
         <CardHeader className="p-0">
           <div className="flex items-start gap-3 w-full">
             <div className="flex-1">
-              <CardTitle className="text-lg text-nvidia">{name}</CardTitle>
-              <CardDescription className="line-clamp-2 text-sm text-white">{description}</CardDescription>
+              <CardTitle className="text-lg text-nvidia">{displayName}</CardTitle>
+              <CardDescription className="line-clamp-2 text-sm text-white">
+                {loading && (
+                  <span className="text-gray-400">Loading repository details…</span>
+                )}
+                {!loading && (details?.goal || project?.description || "No description provided")}
+              </CardDescription>
             </div>
             <CardAction>
               <button 
                 onClick={(e) => {
                   e.stopPropagation();
-                  navigate(`/dashboard/projects/${project.id ?? name.replace(/\s+/g,'-').toLowerCase()}/settings`);
+                  navigate(`/dashboard/projects/${project?.id ?? routeSlug}/settings`);
                 }}
                 className="text-gray-400 hover:text-white transition-colors"
               >
@@ -69,15 +106,35 @@ const ProjectCard = ({ projectName }) => {
 
         <CardContent className="p-0 pt-4">
           <div className="flex flex-wrap gap-2">
-            {tech.map((t) => (
-              <span key={t} className="bg-[#363636]! text-white text-xs px-2 py-1 rounded bg-muted text-muted-foreground">{t}</span>
+            {loading && (
+              <span className="bg-[#363636]! text-gray-300 text-xs px-2 py-1 rounded">Loading…</span>
+            )}
+            {!loading && details?.dependencies?.length > 0 && details.dependencies.slice(0, 4).map((t) => (
+              <span key={t} className="bg-[#363636]! text-white text-xs px-2 py-1 rounded">{t}</span>
             ))}
+            {!loading && details?.doc_generation?.response?.url && (
+              <a
+                href={details.doc_generation.response.url}
+                target="_blank"
+                rel="noreferrer"
+                onClick={(e)=> e.stopPropagation()}
+                className="text-xs px-2 py-1 rounded bg-[#76B900]/15 text-[#76B900] border border-[#76B900]/30 hover:bg-[#76B900]/25 transition"
+              >
+                Docs
+              </a>
+            )}
           </div>
         </CardContent>
       </div>
 
       <CardFooter className="p-0 justify-between">
-        <div className="text-xs text-muted-foreground">Updated {updatedAt}</div>
+        <div className="text-xs text-muted-foreground">
+          {details?.doc_generation?.status ? (
+            <span className="text-gray-400">Status: {details.doc_generation.status}</span>
+          ) : (
+            <span className="text-gray-500">Ready</span>
+          )}
+        </div>
       </CardFooter>
     </Card>
   )

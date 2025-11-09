@@ -169,38 +169,15 @@ const Home = () => {
       </section>
 
       {/* Testimonial Section - Social Proof */}
-      <section className="bg-gray-900 py-20 px-6">
-        <div className="max-w-4xl mx-auto">
-          <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-8 md:p-12 border border-gray-700">
-            <div className="flex items-start gap-4 mb-6">
-              <svg className="w-12 h-12 text-[#76B900] flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
-              </svg>
-            </div>
-            <p className="text-xl md:text-2xl text-white mb-6 leading-relaxed">
-              "NVIDIA Track transformed how we monitor our ML infrastructure. Real-time insights helped us reduce GPU costs by 40%."
-            </p>
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-[#76B900] rounded-full flex items-center justify-center text-white font-bold text-lg">
-                JD
-              </div>
-              <div>
-                <div className="text-white font-semibold">Jane Doe</div>
-                <div className="text-gray-400 text-sm">ML Engineer, Tech Corp</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* Final CTA Section - Repeated Conversion */}
       <section className="bg-gradient-to-b from-gray-900 via-black to-black py-24 px-6 border-t border-gray-800">
         <div className="max-w-4xl mx-auto text-center space-y-8">
           <h2 className="text-4xl md:text-5xl font-bold text-white leading-tight">
-            Ready to <span className="text-[#76B900]">supercharge</span> your GPUs?
+            <span className="text-[#76B900]">One-Link</span> Setup
           </h2>
-          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-            Join thousands of developers optimizing their GPU workloads today
+          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+            Skip the setup. Just paste your GitHub repository link, and our multi-agent system takes care of the rest.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
             <Link 

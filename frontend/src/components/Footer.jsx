@@ -7,7 +7,7 @@ const Footer = () => {
           
           {/* Logo */}
           <div className="text-center md:text-left">
-            <h3 className="text-2xl font-bold text-[#76B900]">NVIDIA Track</h3>
+            <h3 className="text-2xl font-bold text-[#76B900]">AutoDoc</h3>
             <p className="text-gray-500 text-sm mt-2">GPU Monitoring Made Simple</p>
           </div>
 
@@ -56,7 +56,7 @@ const Footer = () => {
         {/* Copyright */}
         <div className="mt-8 pt-8 border-t border-gray-800/50 text-center">
           <p className="text-gray-500 text-sm">
-            © {new Date().getFullYear()} NVIDIA Track. All rights reserved.
+            © {new Date().getFullYear()} AutoDoc. All rights reserved.
           </p>
         </div>
       </div>

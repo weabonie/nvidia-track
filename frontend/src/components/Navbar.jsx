@@ -10,7 +10,7 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-20">
           {/* Logo - Simplified */}
           <Link to="/" className="text-2xl font-bold text-[#76B900] hover:text-[#5d9100] transition-colors">
-            NVIDIA Track
+            AutoDoc
           </Link>
 
           {/* Desktop CTA Button - Single Focus */}

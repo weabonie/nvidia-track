@@ -67,37 +67,59 @@ def ensure_net(name: str):
         subprocess.check_call(["docker", "network", "create", name])
 
 def call_ollama(payload: Dict[str, Any]) -> Dict[str, Any]:
-    system_prompt = "You are a precise docs generator that outputs ONLY JSON per the required schema."
-    user_prompt = f"""You are a docs generator for Docusaurus.
+    system_prompt = """You are a precise Docusaurus documentation generator. 
+    
+CRITICAL RULES:
+1. Output ONLY valid JSON - no markdown, no code fences, no commentary
+2. All files MUST have YAML front matter with id, title, and sidebar_position
+3. File paths must be docs/{slug}.md where slug is lowercase-with-dashes
+4. Create comprehensive, well-structured documentation content
+5. ESCAPE CURLY BRACES: Use {{}} for any literal curly braces in markdown (e.g., /api/{{id}} not /api/{id})
+6. This is MDX format - curly braces are React expressions and MUST be escaped
+7. CODE BLOCKS: Always close code blocks properly with ``` (three backticks, nothing else)
+8. Never use malformed code fences like ``' or `` - always use exactly ```
 
-INPUT (repo spec):
-<JSON>
-{json.dumps(payload, indent=2)}
-</JSON>
+JSON SCHEMA (FOLLOW EXACTLY):
+{
+  "files": [
+    {"path": "docs/intro.md", "content": "---\\nid: intro\\ntitle: Introduction\\nsidebar_position: 1\\n---\\n\\n# Title\\n\\nContent here"}
+  ]
+}"""
 
-TASK:
-- Produce Docusaurus-ready Markdown files from the spec.
-- Every file must include front matter:
-  ---
-  title: ...
-  sidebar_position: ...
-  ---
-- Target files to create if applicable:
-  docs/intro.md
-  docs/install.md
-  docs/how-to-use.md
-  docs/support.md
-  docs/dependencies.md
-  README.md
+    # Build file list from pages input
+    pages = payload.get('pages', {})
+    file_instructions = []
+    for i, (page_name, page_desc) in enumerate(pages.items(), 1):
+        file_slug = slugify(page_name)
+        file_instructions.append(f"""
+{i}. docs/{file_slug}.md (id: {file_slug}, sidebar_position: {i})
+   Page Title: "{page_name}"
+   Content Focus: {page_desc}
+   - Use project info to create relevant content
+   - Include code examples where appropriate
+   - Make it comprehensive and useful""")
 
-RULES:
-- Output JSON ONLY with:
-  {{
-    "files": [{{"path":"docs/intro.md","content":"<md>"}}, ...]
-  }}
-- No extra keys. No commentary. No code fences.
-- Use clear steps for Node/React; use lists and code blocks when helpful.
-"""
+    user_prompt = f"""Generate Docusaurus documentation for this project:
+
+PROJECT INFO:
+- Name: {payload.get('name')}
+- Description: {payload.get('description')}
+- Goal: {payload.get('goal')}
+- Dependencies: {', '.join(payload.get('dependencies', []))}
+- Installation Steps: {', '.join(payload.get('installation', []))}
+
+CREATE EXACTLY {len(pages)} FILES:
+{''.join(file_instructions)}
+
+IMPORTANT:
+- First file ({list(pages.keys())[0]}) is the HOMEPAGE
+- Use YAML front matter: id, title, sidebar_position
+- Make content detailed and useful based on page description
+- Include code blocks with proper syntax highlighting
+- Use Markdown formatting (headers, lists, links, etc.)
+
+OUTPUT: JSON with "files" array only. No other text."""
+
     r = requests.post(OLLAMA_URL, json={
         "model": OLLAMA_MODEL,
         "messages": [
@@ -112,32 +134,33 @@ RULES:
     if not content: raise RuntimeError("Ollama returned empty content")
     
     # Log raw response for debugging
-    logger.debug(f"Raw Ollama response: {{content[:500]}}...")
+    logger.debug(f"Raw Ollama response: {content[:500]}...")
     
     try:
         bundle = json.loads(content)
     except json.JSONDecodeError as e:
-        logger.error(f"Failed to parse Ollama JSON: {{e}}")
-        logger.error(f"Content was: {{content[:1000]}}")
-        raise RuntimeError(f"Ollama returned invalid JSON: {{e}}")
+        logger.error(f"Failed to parse Ollama JSON: {e}")
+        logger.error(f"Content was: {content[:1000]}")
+        raise RuntimeError(f"Ollama returned invalid JSON: {e}")
     
     if "files" not in bundle or not isinstance(bundle["files"], list):
-        logger.error(f"Bundle structure: {{bundle}}")
+        logger.error(f"Bundle structure: {bundle}")
         raise RuntimeError('Model JSON missing "files" array')
     
     # Validate file structure
     for i, f in enumerate(bundle["files"]):
         if isinstance(f, str):
-            logger.error(f"File {{i}} is a string, not an object: {{f[:100]}}")
-            raise RuntimeError(f"File {{i}} is malformed - expected object with 'path' and 'content'")
+            logger.error(f"File {i} is a string, not an object: {f[:100]}")
+            raise RuntimeError(f"File {i} is malformed - expected object with 'path' and 'content'")
         if not isinstance(f, dict):
-            raise RuntimeError(f"File {{i}} is not a dict: {{type(f)}}")
+            raise RuntimeError(f"File {i} is not a dict: {type(f)}")
         if "path" not in f or "content" not in f:
-            raise RuntimeError(f"File {{i}} missing required keys. Has: {{list(f.keys())}}")
+            raise RuntimeError(f"File {i} missing required keys. Has: {list(f.keys())}")
     
+    logger.info(f"Files to be created: {[f.get('path') for f in bundle['files']]}")
     return bundle
 
-def write_minimal_docusaurus(site_dir: Path, site_title: str, site_base_url: str):
+def write_minimal_docusaurus(site_dir: Path, site_title: str, site_base_url: str, pages: dict):
     # Minimal classic preset scaffold
     (site_dir / "docs").mkdir(parents=True, exist_ok=True)
     (site_dir / "static").mkdir(parents=True, exist_ok=True)
@@ -192,35 +215,150 @@ export default {{
 }};
 """, encoding="utf-8")
 
-    (site_dir / "sidebars.js").write_text("""\
-/** @type {import('@docusaurus/plugin-content-docs').SidebarsConfig} */
-export default {
-  tutorialSidebar: [{type: 'autogenerated', dirName: '.'}],
-};
+    # Build sidebar from pages input
+    sidebar_items = []
+    for i, (page_name, _) in enumerate(pages.items(), 1):
+        file_slug = slugify(page_name)
+        sidebar_items.append(f'    {{type: "doc", id: "{file_slug}", label: "{page_name}"}}')
+    
+    sidebar_content = ",\n".join(sidebar_items)
+    (site_dir / "sidebars.js").write_text(f"""\
+/** @type {{import('@docusaurus/plugin-content-docs').SidebarsConfig}} */
+export default {{
+  tutorialSidebar: [
+{sidebar_content}
+  ],
+}};
 """, encoding="utf-8")
 
-def write_docs(site_dir: Path, files):
+def fix_mdx_curly_braces(content: str) -> str:
+    """
+    Escape single curly braces in MDX content to prevent React errors.
+    MDX treats {variable} as JavaScript expressions, so we need {{variable}} for literals.
+    This function preserves code blocks, fixes malformed code fences, and escapes braces outside code blocks.
+    """
+    lines = content.split('\n')
+    result = []
+    in_code_block = False
+    in_frontmatter = False
+    frontmatter_count = 0
+    
+    for i, line in enumerate(lines):
+        # Track frontmatter (YAML front matter between --- markers)
+        if line.strip() == '---':
+            frontmatter_count += 1
+            if frontmatter_count <= 2:
+                in_frontmatter = True
+            if frontmatter_count == 2:
+                in_frontmatter = False
+            result.append(line)
+            continue
+        
+        # Fix malformed code fences - check for ``' or other common issues
+        stripped = line.strip()
+        if stripped.startswith('``') and not stripped.startswith('```'):
+            # Likely a malformed code fence like ``' or ``
+            logger.warning(f"Line {i+1}: Found malformed code fence '{stripped}', fixing to '```'")
+            line = line.replace(stripped, '```')
+            stripped = '```'
+        
+        # Track code blocks (```)
+        if stripped.startswith('```'):
+            in_code_block = not in_code_block
+            result.append(line)
+            continue
+        
+        # Don't modify code blocks or frontmatter
+        if in_code_block or in_frontmatter:
+            result.append(line)
+            continue
+        
+        # Escape single curly braces outside of code blocks
+        # Replace {anything} with {{anything}} but avoid {{ and }} already escaped
+        modified_line = line
+        # Use regex to find single curly braces and escape them
+        modified_line = re.sub(r'(?<!\{)\{(?!\{)', '{{', modified_line)  # { -> {{
+        modified_line = re.sub(r'(?<!\})\}(?!\})', '}}', modified_line)  # } -> }}
+        
+        result.append(modified_line)
+    
+    # Check if we ended with an unclosed code block
+    if in_code_block:
+        logger.warning("Unclosed code block detected at end of file, adding closing fence")
+        result.append('```')
+    
+    return '\n'.join(result)
+
+def write_docs(site_dir: Path, files, pages: dict):
+    # Get the first page info (this will be the homepage)
+    first_page_name = list(pages.keys())[0]
+    first_page_slug = slugify(first_page_name)
+    
     for f in files:
         rel = f.get("path"); content = f.get("content","")
         if not rel or not isinstance(rel, str): continue
         out = site_dir / rel
         out.parent.mkdir(parents=True, exist_ok=True)
+        
+        # CRITICAL: Escape unescaped curly braces for MDX (outside of code blocks)
+        # This prevents React/MDX errors when using {id}, {param}, etc. in text
+        content = fix_mdx_curly_braces(content)
+        
+        # CRITICAL: Add slug: / to the first page's frontmatter so it serves as homepage
+        if rel == f"docs/{first_page_slug}.md":
+            # Check if content has frontmatter
+            if content.startswith("---"):
+                lines = content.split("\n")
+                # Find the end of frontmatter
+                frontmatter_end = -1
+                for i in range(1, len(lines)):
+                    if lines[i].strip() == "---":
+                        frontmatter_end = i
+                        break
+                
+                if frontmatter_end > 0:
+                    # Check if slug already exists
+                    has_slug = any("slug:" in line for line in lines[1:frontmatter_end])
+                    if not has_slug:
+                        # Add slug: / to frontmatter
+                        lines.insert(frontmatter_end, "slug: /")
+                        content = "\n".join(lines)
+                        logger.info(f"Added 'slug: /' to {rel} frontmatter")
+        
         out.write_text(content, encoding="utf-8")
+    
+    # CRITICAL: Ensure ALL expected pages exist (create fallbacks for missing ones)
+    for i, (page_name, page_desc) in enumerate(pages.items(), 1):
+        page_slug = slugify(page_name)
+        page_file = site_dir / "docs" / f"{page_slug}.md"
+        
+        if not page_file.exists():
+            logger.warning(f"{page_slug}.md not found! Creating fallback page...")
+            is_homepage = (i == 1)
+            page_file.write_text(f"""---
+id: {page_slug}
+title: {page_name}
+sidebar_position: {i}
+{('slug: /' if is_homepage else '')}
+---
+
+# {page_name}
+
+{page_desc}
+
+This page is under construction and will be updated soon.
+""", encoding="utf-8")
+            logger.info(f"Created fallback page: {page_slug}.md")
 
 def write_docker(site_dir: Path):
     (site_dir / "Dockerfile").write_text("""\
-# Build stage
-FROM node:18-alpine AS build
+FROM node:18-alpine
 WORKDIR /site
 COPY package.json package-lock.json* yarn.lock* pnpm-lock.yaml* .npmrc* ./
 RUN npm ci || npm i
 COPY . .
-RUN npm run build
-
-# Serve stage
-FROM nginx:alpine
-COPY --from=build /site/build /usr/share/nginx/html
-EXPOSE 80
+EXPOSE 3000
+CMD ["npx", "docusaurus", "start", "--host", "0.0.0.0", "--port", "3000"]
 """, encoding="utf-8")
 
     (site_dir / "docker-compose.yml").write_text("""\
@@ -232,7 +370,7 @@ services:
     restart: unless-stopped
     networks: [docs_net]
     ports:
-      - "${PORT}:80"
+      - "${PORT}:3000"
 
 networks:
   docs_net:
@@ -240,10 +378,30 @@ networks:
 """, encoding="utf-8")
 
 def docker_up(site_dir: Path, image: str, container: str, port: int):
-    # .env per service
-    (site_dir / ".env").write_text(f"IMAGE_NAME={image}\nCONTAINER_NAME={container}\nPORT={port}\n", encoding="utf-8")
     ensure_net(DOCKER_NETWORK)
-    subprocess.check_call(["docker", "compose", "-f", str(site_dir / "docker-compose.yml"), "up", "-d"], cwd=site_dir)
+    
+    # Build with --no-cache to ensure completely fresh build (no cached layers)
+    logger.info(f"Building fresh Docker image with --no-cache...")
+    subprocess.check_call([
+        "docker", "build",
+        "--no-cache",
+        "-t", image,
+        str(site_dir)
+    ])
+    
+    # Start container with docker-compose
+    logger.info(f"Starting container on port {port}...")
+    env = os.environ.copy()
+    env.update({
+        "IMAGE_NAME": image,
+        "CONTAINER_NAME": container,
+        "PORT": str(port)
+    })
+    subprocess.check_call([
+        "docker", "compose", 
+        "-f", str(site_dir / "docker-compose.yml"),
+        "up", "-d", "--force-recreate"
+    ], cwd=site_dir, env=env)
 
 @app.route("/generate-docs", methods=["POST"])
 def generate_docs():
@@ -258,12 +416,30 @@ def generate_docs():
         fqdn = f"{slug}-doc.{BASE_DOMAIN}"
         logger.info(f"Generated slug: {slug}, FQDN: {fqdn}")
 
+        # CRITICAL: If site exists, completely nuke it and its container first
         site_dir = SITES_ROOT / slug
-        if site_dir.exists(): 
-            logger.info(f"Removing existing site dir: {site_dir}")
+        image = f"docusite:{slug}"
+        container = f"docusite_{slug}"
+        
+        if site_dir.exists():
+            logger.info(f"Existing site detected! Performing NUCLEAR cleanup...")
+            # Stop and remove container
+            logger.info(f"Stopping and removing container: {container}")
+            subprocess.run(["docker", "stop", container], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            subprocess.run(["docker", "rm", "-f", container], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            # Remove image to force rebuild
+            logger.info(f"Removing Docker image: {image}")
+            subprocess.run(["docker", "rmi", "-f", image], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            # Prune build cache to remove all cached layers
+            logger.info("Pruning Docker build cache...")
+            subprocess.run(["docker", "builder", "prune", "-f"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            # Remove site directory
+            logger.info(f"Removing site directory: {site_dir}")
             shutil.rmtree(site_dir)
+            logger.info("Nuclear cleanup complete!")
+        
         site_dir.mkdir(parents=True, exist_ok=True)
-        logger.info(f"Created site directory: {site_dir}")
+        logger.info(f"Created fresh site directory: {site_dir}")
 
         # 1) Get files from Ollama
         logger.info("Step 1: Calling Ollama to generate docs...")
@@ -272,11 +448,11 @@ def generate_docs():
 
         # 2) Minimal docusaurus scaffold
         logger.info("Step 2: Writing Docusaurus scaffold...")
-        write_minimal_docusaurus(site_dir, site_title=payload["name"], site_base_url=fqdn)
+        write_minimal_docusaurus(site_dir, site_title=payload["name"], site_base_url=fqdn, pages=payload["pages"])
 
         # 3) Write docs
         logger.info("Step 3: Writing generated docs...")
-        write_docs(site_dir, bundle["files"])
+        write_docs(site_dir, bundle["files"], payload["pages"])
 
         # 4) Dockerize and run
         logger.info("Step 4: Creating Docker files and building...")
@@ -342,7 +518,7 @@ def npm_login() -> str:
     return r.json()["token"]
 
 def npm_create_proxy(token: str, domain: str, forward_ip: str, forward_port: int):
-    """Create or update NPM proxy host"""
+    """Create or update NPM proxy host with SSL"""
     headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
     
     # Check if proxy already exists
@@ -350,37 +526,88 @@ def npm_create_proxy(token: str, domain: str, forward_ip: str, forward_port: int
     r.raise_for_status()
     existing = [p for p in r.json() if domain in p.get("domain_names", [])]
     
-    payload = {
-        "domain_names": [domain],
-        "forward_scheme": "http",
-        "forward_host": forward_ip,
-        "forward_port": forward_port,
-        "access_list_id": 0,
-        "certificate_id": 0,
-        "ssl_forced": False,
-        "caching_enabled": False,
-        "block_exploits": True,
-        "advanced_config": "",
-        "meta": {"letsencrypt_agree": False, "dns_challenge": False},
-        "allow_websocket_upgrade": True,
-        "http2_support": True,
-        "forward_host_header": True,
-        "hsts_enabled": False,
-        "hsts_subdomains": False
-    }
+    # Get SSL certificate (should be CloudFlare Siru.Dev wildcard)
+    cert_id = 0
+    try:
+        certs_r = requests.get(f"{NPM_HOST}/api/nginx/certificates", headers=headers, timeout=10)
+        certs_r.raise_for_status()
+        # Look for CloudFlare cert or wildcard cert
+        for cert in certs_r.json():
+            cert_name = cert.get("nice_name", "").lower()
+            cert_domains = cert.get("domain_names", [])
+            # Match CloudFlare cert or wildcard
+            if "cloudflare" in cert_name or "siru.dev" in cert_name or "*.siru.dev" in cert_domains:
+                cert_id = cert["id"]
+                logger.info(f"Using SSL cert: {cert.get('nice_name', 'Unknown')} (ID: {cert_id})")
+                break
+        
+        if cert_id == 0:
+            logger.warning("No SSL certificate found! Proxy will use HTTP only.")
+    except Exception as e:
+        logger.error(f"Could not fetch certificates: {e}")
     
     if existing:
-        # Update existing
+        # Update existing - only send the exact fields NPM expects
         host_id = existing[0]["id"]
-        payload["id"] = host_id
+        existing_data = existing[0]
+        
+        # Build minimal update payload with only allowed fields
+        payload = {
+            "domain_names": existing_data.get("domain_names", [domain]),
+            "forward_scheme": existing_data.get("forward_scheme", "http"),
+            "forward_host": forward_ip,
+            "forward_port": forward_port,
+            "access_list_id": existing_data.get("access_list_id", 0),
+            "certificate_id": cert_id,
+            "ssl_forced": True if cert_id > 0 else False,
+            "caching_enabled": existing_data.get("caching_enabled", False),
+            "block_exploits": existing_data.get("block_exploits", True),
+            "advanced_config": existing_data.get("advanced_config", ""),
+            "meta": existing_data.get("meta", {}),
+            "allow_websocket_upgrade": existing_data.get("allow_websocket_upgrade", True),
+            "http2_support": existing_data.get("http2_support", True),
+            "hsts_enabled": existing_data.get("hsts_enabled", False),
+            "hsts_subdomains": existing_data.get("hsts_subdomains", False)
+        }
+        
+        logger.info(f"Updating existing proxy host ID {host_id}: {forward_ip}:{forward_port}")
         r = requests.put(f"{NPM_HOST}/api/nginx/proxy-hosts/{host_id}", 
                         headers=headers, json=payload, timeout=10)
+        try:
+            r.raise_for_status()
+        except requests.HTTPError as e:
+            logger.error(f"NPM update failed with status {r.status_code}")
+            logger.error(f"Response: {r.text}")
+            raise
     else:
         # Create new
+        payload = {
+            "domain_names": [domain],
+            "forward_scheme": "http",
+            "forward_host": forward_ip,
+            "forward_port": forward_port,
+            "access_list_id": 0,
+            "certificate_id": cert_id,
+            "ssl_forced": True if cert_id > 0 else False,
+            "caching_enabled": False,
+            "block_exploits": True,
+            "advanced_config": "",
+            "allow_websocket_upgrade": True,
+            "http2_support": True,
+            "hsts_enabled": False,
+            "hsts_subdomains": False
+        }
+        
+        logger.info(f"Creating new proxy host for {domain}")
         r = requests.post(f"{NPM_HOST}/api/nginx/proxy-hosts", 
                          headers=headers, json=payload, timeout=10)
+        try:
+            r.raise_for_status()
+        except requests.HTTPError as e:
+            logger.error(f"NPM create failed with status {r.status_code}")
+            logger.error(f"Response: {r.text}")
+            raise
     
-    r.raise_for_status()
     return r.json()
 
 if __name__ == "__main__":

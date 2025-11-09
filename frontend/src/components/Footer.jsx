@@ -8,7 +8,7 @@ const Footer = () => {
           {/* Logo */}
           <div className="text-center md:text-left">
             <h3 className="text-2xl font-bold text-[#76B900]">AutoDoc</h3>
-            <p className="text-gray-500 text-sm mt-2">GPU Monitoring Made Simple</p>
+            <p className="text-gray-500 text-sm mt-2">Documentation Made Simple</p>
           </div>
 
           {/* Legal Links */}

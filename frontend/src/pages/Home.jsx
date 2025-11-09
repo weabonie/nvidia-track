@@ -25,11 +25,11 @@ const Home = () => {
         <div className="relative w-[90%] max-w-8xl mx-auto text-left px-2 z-10">
           {/* Main Headline - Clear Value Prop */}
           <h1
-            className="flex flex-col space-y-2 text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-normal! leading-tight mb-6 animate-fade-in-up opacity-0"
+            className="flex flex-col space-y-2 text-2xl! sm:text-3xl! md:text-4xl! lg:text-6xl! font-normal! leading-tight mb-6 animate-fade-in-up opacity-0"
             style={{ animationDelay: "0.1s" }}
           >
             <span className="text-[#76B900]">Say hello to your</span>
-            <span className="text-white">AI-Powered <TypingText words={["Project Management Assistant.", "Coding Assistant.", "Design Assistant.", "Research Assistant."]} typingSpeed={80} deletingSpeed={40} pause={1400} className="text-white inline-block" /></span>
+            <span className="text-white">AI-Powered <TypingText words={["Project Assistant.", "Coding Assistant.", "Design Assistant.", "Research Assistant."]} typingSpeed={80} deletingSpeed={40} pause={1400} className="text-white inline-block" /></span>
           </h1>
 
           {/* Subheadline - Benefit-Driven */}
@@ -83,13 +83,21 @@ const Home = () => {
             </div>
           </div> */}
         </div>
+        {/* Preview image (served from public/home-preview.png). Hidden on small screens. Anchored bottom-right of the hero on md+. */}
+        <img
+          src="/home-preview.png"
+          alt="Home preview"
+          aria-hidden="true"
+          className="pointer-events-none hidden md:block absolute right-30 bottom-0 z-20 w-56 md:w-140 lg:w-192 rounded-2xl shadow-2xl opacity-95 animate-fade-in-up opacity-0"
+          style={{ }}
+        />
       </section>
 
       {/* Key Benefits Section - Rule of Three */}
-      <section id="benefits" className="bg-gradient-to-b from-black to-gray-900 py-24 px-6">
+      <section id="benefits" className="bg-gradient-to-b from-black to-gray-900 py-24 px-6 relative">
         <div className="max-w-7xl mx-auto">
           {/* Section Header */}
-          <div className="text-center mb-16">
+          <div className="text-center mb-16 opacity-0 animate-fade-in-up">
             <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">
               Save <span className="text-[#76B900]">hours</span> of manual writing.
             </h2>
@@ -102,8 +110,8 @@ const Home = () => {
           <div className="grid md:grid-cols-3 gap-8 lg:gap-12">
             {/* Benefit 1 - Real-Time Monitoring */}
             <div 
-              className="group bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-2xl p-8 hover:border-[#76B900]/50 transition-all duration-300 hover:transform hover:scale-105 animate-fade-in-up opacity-0"
-              style={{ animationDelay: "0.1s" }}
+              className="group bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-2xl p-8 hover:border-[#76B900]/50 transition-all duration-300 hover:transform hover:scale-105 opacity-0 animate-fade-in-up"
+              style={{ animationDelay: "0.2s" }}
             >
               <div className="flex justify-center mb-6">
                 <div className="w-16 h-16 bg-[#76B900]/10 rounded-2xl flex items-center justify-center group-hover:bg-[#76B900]/20 transition-colors">
@@ -123,8 +131,8 @@ const Home = () => {
 
             {/* Benefit 2 - Smart Analytics */}
             <div 
-              className="group bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-2xl p-8 hover:border-[#76B900]/50 transition-all duration-300 hover:transform hover:scale-105 animate-fade-in-up opacity-0"
-              style={{ animationDelay: "0.2s" }}
+              className="group bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-2xl p-8 hover:border-[#76B900]/50 transition-all duration-300 hover:transform hover:scale-105 opacity-0 animate-fade-in-up"
+              style={{ animationDelay: "0.3s" }}
             >
               <div className="flex justify-center mb-6">
                 <div className="w-16 h-16 bg-[#76B900]/10 rounded-2xl flex items-center justify-center group-hover:bg-[#76B900]/20 transition-colors">
@@ -146,8 +154,8 @@ const Home = () => {
 
             {/* Benefit 3 - Enterprise Ready */}
             <div 
-              className="group bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-2xl p-8 hover:border-[#76B900]/50 transition-all duration-300 hover:transform hover:scale-105 animate-fade-in-up opacity-0"
-              style={{ animationDelay: "0.3s" }}
+              className="group bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-2xl p-8 hover:border-[#76B900]/50 transition-all duration-300 hover:transform hover:scale-105 opacity-0 animate-fade-in-up"
+              style={{ animationDelay: "0.4s" }}
             >
               <div className="flex justify-center mb-6">
                 <div className="w-16 h-16 bg-[#76B900]/10 rounded-2xl flex items-center justify-center group-hover:bg-[#76B900]/20 transition-colors">

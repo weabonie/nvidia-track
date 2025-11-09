@@ -717,11 +717,11 @@ def get_pages(project_context: dict, dependencies: list, llm) -> dict:
         # Build detailed context for the LLM
         context_summary = f"""PROJECT ANALYSIS:
 
-README Content:
-{project_context['readme'][:3000]}
+README Content (first 4000 chars):
+{project_context['readme'][:4000]}
 
-File Structure (first 30 files):
-{chr(10).join(project_context['file_structure'][:30])}
+File Structure (first 50 files):
+{chr(10).join(project_context['file_structure'][:50])}
 
 Main Entry Files Found:
 {chr(10).join(project_context['main_files']) if project_context['main_files'] else 'None'}
@@ -733,10 +733,13 @@ Technologies Detected:
 {', '.join(dependencies)}
 
 Code Samples:
-{json.dumps(project_context['code_samples'], indent=2)[:1000]}
+{json.dumps(project_context['code_samples'], indent=2)[:1500]}
+
+IMPORTANT: Generate 7-10 SPECIFIC sections based on what you see above. Each section MUST have a meaningful description that references actual project content.
 """
         
         logger.debug(f"Context sent to LLM: {len(context_summary)} chars")
+        logger.info(f"Asking LLM to generate pages with {len(project_context['readme'])} chars of readme, {len(project_context['file_structure'])} files, {len(dependencies)} dependencies")
         
         structured_llm = llm.with_structured_output(Pages)
         prompt = ChatPromptTemplate.from_messages([
@@ -799,17 +802,23 @@ Each section description should mention SPECIFIC files, classes, or features fro
         response = chain.invoke({ 'context': context_summary })
         
         logger.info(f"LLM generated {len(response.pages)} documentation sections")
+        logger.debug(f"Raw LLM pages: {response.pages}")
         
-        # Sanitize page titles - remove markdown formatting
+        # Sanitize page titles - remove markdown formatting and filter out empty/bad pages
         sanitized_pages = {}
         for title, description in response.pages.items():
             # Remove markdown bold/italic markers and other formatting
             clean_title = title.replace('**', '').replace('__', '').replace('*', '').replace('_', '').strip()
             # Remove any leading numbers or bullets (e.g., "1. ", "- ", "• ")
-            clean_title = clean_title.lstrip('0123456789.- •')
-            sanitized_pages[clean_title] = description
+            clean_title = clean_title.lstrip('0123456789.- •').strip()
+            
+            # Skip pages with empty descriptions or too-short titles
+            if description and len(description.strip()) > 0 and len(clean_title) > 2:
+                sanitized_pages[clean_title] = description
+            else:
+                logger.warning(f"Skipping invalid page: '{clean_title}' with description: '{description}'")
         
-        logger.info(f"Sanitized page titles: {list(sanitized_pages.keys())}")
+        logger.info(f"Sanitized page titles ({len(sanitized_pages)} valid pages): {list(sanitized_pages.keys())}")
         
         # Ensure we have at least 7 sections (add smart defaults based on project type)
         if len(sanitized_pages) < 7:

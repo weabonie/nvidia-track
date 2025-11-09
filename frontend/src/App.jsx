@@ -27,14 +27,7 @@ const router = createBrowserRouter([
         index: true, // This makes Home the default child route for '/'
         element: <Home />,
       },
-      // {
-      //   path: 'about',
-      //   element: <About />,
-      // },
-      // {
-      //   path: 'contact',
-      //   element: <Contact />,
-      // },
+   
     ],
   },
   // You can add other top-level routes without the main layout here if needed

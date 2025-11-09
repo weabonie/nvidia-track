@@ -72,12 +72,13 @@ def call_ollama(payload: Dict[str, Any]) -> Dict[str, Any]:
 CRITICAL RULES:
 1. Output ONLY valid JSON - no markdown, no code fences, no commentary
 2. All files MUST have YAML front matter with id, title, and sidebar_position
-3. File paths must be docs/{slug}.md where slug is lowercase-with-dashes
+3. File paths must be docs/SLUG.md where SLUG is lowercase-with-dashes
 4. Create comprehensive, well-structured documentation content
-5. ESCAPE CURLY BRACES: Use {{}} for any literal curly braces in markdown (e.g., /api/{{id}} not /api/{id})
-6. This is MDX format - curly braces are React expressions and MUST be escaped
-7. CODE BLOCKS: Always close code blocks properly with ``` (three backticks, nothing else)
-8. Never use malformed code fences like ``' or `` - always use exactly ```
+5. NEVER USE CURLY BRACES for parameters - use :parameter or [parameter] syntax instead
+   Example: /api/users/:id or /api/users/[id] (NOT /api/users/{id})
+6. This is MDX format - curly braces cause React errors
+7. CODE BLOCKS: Always close code blocks properly with three backticks
+8. Never use malformed code fences
 
 JSON SCHEMA (FOLLOW EXACTLY):
 {

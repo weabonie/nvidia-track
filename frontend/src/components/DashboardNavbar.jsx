@@ -47,7 +47,7 @@ const DashboardNavbar = () => {
                 to="/projects" 
                 className="px-3 py-1.5 text-sm text-white font-medium rounded-md hover:bg-gray-900 transition-colors duration-150"
               >
-                Overview
+                Projects
               </Link>
               <Link 
                 to="/projects/integrations" 

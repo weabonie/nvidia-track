@@ -752,3 +752,77 @@ KeyError: 'Input to ChatPromptTemplate is missing variables {\'\\n  "pages"\'}. 
 2025-11-09 15:36:12,500 - werkzeug - INFO -  * Restarting with stat
 2025-11-09 15:36:13,868 - werkzeug - WARNING -  * Debugger is active!
 2025-11-09 15:36:13,869 - werkzeug - INFO -  * Debugger PIN: 529-206-346
+2025-11-09 10:01:19,823 - __main__ - INFO - Created tmp directory
+2025-11-09 10:01:27,430 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:3333
+ * Running on http://10.162.171.154:3333
+2025-11-09 10:01:27,430 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-11-09 10:01:27,431 - werkzeug - INFO -  * Restarting with stat
+2025-11-09 10:01:32,039 - werkzeug - WARNING -  * Debugger is active!
+2025-11-09 10:01:32,039 - werkzeug - INFO -  * Debugger PIN: 176-499-935
+2025-11-09 10:02:31,559 - __main__ - INFO - [524ed31e] New ingest request received
+2025-11-09 10:02:32,332 - __main__ - INFO - [524ed31e] Processing repository: github.com/TodePond/GulfOfMexico.git
+2025-11-09 10:02:32,332 - __main__ - INFO - [524ed31e] Cloning repository to tmp/896a3488-3a54-4578-be3b-b490d24f4f0d...
+2025-11-09 10:03:31,673 - __main__ - INFO - [524ed31e] Repository cloned successfully
+2025-11-09 10:03:31,674 - __main__ - INFO - [524ed31e] Step 1/7: Detecting dependencies...
+2025-11-09 10:03:31,674 - __main__ - INFO - Starting dependency detection for: tmp/896a3488-3a54-4578-be3b-b490d24f4f0d
+2025-11-09 10:03:31,675 - __main__ - INFO - Detected languages from file extensions: {'HTML'}
+2025-11-09 10:03:31,676 - __main__ - INFO - Final dependencies detected: ['HTML']
+2025-11-09 10:03:31,676 - __main__ - INFO - [524ed31e] Step 2/7: Building project context...
+2025-11-09 10:03:31,676 - __main__ - INFO - Building comprehensive project context for: tmp/896a3488-3a54-4578-be3b-b490d24f4f0d
+2025-11-09 10:03:31,676 - __main__ - INFO - Reading all markdown files...
+2025-11-09 10:03:31,681 - __main__ - INFO - Read 25 markdown files, total 39711 characters
+2025-11-09 10:03:31,681 - __main__ - INFO - Scanning file structure...
+2025-11-09 10:03:31,684 - __main__ - INFO - Found 92 files in structure
+2025-11-09 10:03:31,684 - __main__ - INFO - Identifying main entry files...
+2025-11-09 10:03:31,685 - __main__ - INFO - Found entry file: docs/vision-pro/index.html
+2025-11-09 10:03:31,696 - __main__ - INFO - Reading sample code from main files...
+2025-11-09 10:03:31,696 - __main__ - INFO - Read code sample from docs/vision-pro/index.html: 2000 chars
+2025-11-09 10:03:31,696 - __main__ - INFO - Identifying configuration files...
+2025-11-09 10:03:31,697 - __main__ - INFO - Project context built: 39711 chars of docs, 92 files, 1 entry points, 0 config files
+2025-11-09 10:03:31,697 - __main__ - INFO - [524ed31e] Step 3/7: Extracting repo name...
+2025-11-09 10:03:31,697 - __main__ - INFO - [524ed31e] Repo name: GulfOfMexico -> gulfofmexico
+2025-11-09 10:03:31,697 - __main__ - INFO - [524ed31e] Step 4/7: Calling LLM for project name and description...
+2025-11-09 10:03:31,697 - __main__ - INFO - LLM call: Extracting project name and description
+2025-11-09 10:03:36,032 - httpx - INFO - HTTP Request: POST http://204.52.27.251:11434/v1/chat/completions "HTTP/1.1 200 OK"
+2025-11-09 10:03:36,051 - __main__ - INFO - LLM response: name='Gulf Of Mexico', description='...'
+2025-11-09 10:03:36,051 - __main__ - INFO - [524ed31e] Step 5/7: Calling LLM for project goal...
+2025-11-09 10:03:36,051 - __main__ - INFO - LLM call: Extracting project goal/description
+2025-11-09 10:03:40,995 - httpx - INFO - HTTP Request: POST http://204.52.27.251:11434/v1/chat/completions "HTTP/1.1 200 OK"
+2025-11-09 10:03:41,006 - __main__ - INFO - LLM response: goal='Gulf of Mexico Project...'
+2025-11-09 10:03:41,006 - __main__ - INFO - [524ed31e] Step 6/8: Calling LLM for installation steps...
+2025-11-09 10:03:41,006 - __main__ - INFO - LLM call: Generating installation steps
+2025-11-09 10:03:47,033 - httpx - INFO - HTTP Request: POST http://204.52.27.251:11434/v1/chat/completions "HTTP/1.1 200 OK"
+2025-11-09 10:03:47,046 - __main__ - INFO - LLM generated 5 installation steps
+2025-11-09 10:03:47,047 - __main__ - INFO - [524ed31e] Step 7/8: Generating documentation pages...
+2025-11-09 10:03:47,047 - __main__ - INFO - [524ed31e] Using standard LLM-based page generation (add ?deep_analysis=true for code analysis)
+2025-11-09 10:03:47,047 - __main__ - INFO - LLM call: Generating documentation page structure
+2025-11-09 10:03:47,047 - __main__ - INFO - Asking LLM to generate pages with 39711 chars of readme, 92 files, 1 dependencies
+2025-11-09 10:04:09,687 - httpx - INFO - HTTP Request: POST http://204.52.27.251:11434/v1/chat/completions "HTTP/1.1 200 OK"
+2025-11-09 10:04:09,772 - __main__ - INFO - LLM response type: <class 'schemas.Pages.Pages'>
+2025-11-09 10:04:09,772 - __main__ - INFO - LLM response: pages={'Project Overview': "High-level introduction to the Gulf of Mexico project, covering its purpose, goals, and key features, as hinted at in the README's feature section (linked from Examples.md).", 'Getting Started with Gulf of Mexico': 'Step-by-step guide for new users, including setup instructions and initial configuration, inferred as necessary due to the presence of various suite databases (e.g., suite/exporting.db, suite/regular-expressions.db).', 'Code Examples and Demos': 'In-depth exploration of the examples provided in LICENSE.md, such as Hello World, FizzBuzz, Fibonacci, Counter, and The Billion Dollar Mistake, highlighting their functionality and implementation.', 'Community Guidelines and Conduct': "Detailed overview of the project's Code of Conduct (CODE_OF_CONDUCT.md), emphasizing the importance of a harassment-free environment, expected behavior, and enforcement responsibilities for community leaders.", 'Security and Vulnerability Reporting': 'Guidance on security best practices and how to report vulnerabilities, which, although currently placeholder content in SECURITY.md, is crucial for project integrity and user trust.', 'Database Structure and Suite Overview': "Technical explanation of the database structure (e.g., twotwotwotwo.db, suite/*.db) and the purpose of each suite (e.g., semantic-naming, overloading), aiding in understanding the project's backend.", 'HTML and CSS Implementation Details': 'Analysis of the HTML and CSS used in docs/vision-pro/index.html, discussing layout choices, styling decisions (e.g., the wobble animation), and how these contribute to the user experience.', 'Contributor Resources and Setup': "Practical information for potential contributors, including setup instructions for development environments, referencing the absence of explicit config files but implying a need for such guidance based on the project's complexity."}
+2025-11-09 10:04:09,772 - __main__ - INFO - LLM generated 8 documentation sections
+2025-11-09 10:04:09,773 - __main__ - INFO - Sanitized page titles (8 valid pages): ['Project Overview', 'Getting Started with Gulf of Mexico', 'Code Examples and Demos', 'Community Guidelines and Conduct', 'Security and Vulnerability Reporting', 'Database Structure and Suite Overview', 'HTML and CSS Implementation Details', 'Contributor Resources and Setup']
+2025-11-09 10:04:09,773 - __main__ - INFO - [524ed31e] Constructing final result...
+2025-11-09 10:04:09,773 - __main__ - INFO - [524ed31e] Result constructed with 8 documentation pages
+2025-11-09 10:04:09,773 - __main__ - INFO - [524ed31e] Sending to documentation generator: http://204.52.26.255:8080/generate-docs
+2025-11-09 10:06:24,028 - __main__ - INFO - [524ed31e] Documentation generator response status: 200
+2025-11-09 10:06:24,028 - __main__ - INFO - [524ed31e] Documentation generated successfully!
+2025-11-09 10:06:24,028 - __main__ - INFO - [524ed31e] Request completed successfully
+2025-11-09 10:06:24,044 - __main__ - INFO - [524ed31e] Cleaned up temporary directory: tmp/896a3488-3a54-4578-be3b-b490d24f4f0d
+2025-11-09 10:06:24,046 - werkzeug - INFO - 127.0.0.1 - - [09/Nov/2025 10:06:24] "GET /ingest?repo_url=github.com/TodePond/GulfOfMexico.git HTTP/1.1" 200 -
+2025-11-09 10:06:24,107 - werkzeug - INFO - 127.0.0.1 - - [09/Nov/2025 10:06:24] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-11-09 10:06:56,342 - werkzeug - INFO - 127.0.0.1 - - [09/Nov/2025 10:06:56] "GET /repos HTTP/1.1" 200 -
+2025-11-09 10:06:56,395 - werkzeug - INFO - 127.0.0.1 - - [09/Nov/2025 10:06:56] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-11-09 10:07:05,800 - werkzeug - INFO - 127.0.0.1 - - [09/Nov/2025 10:07:05] "GET /repo?repo=gulfofmexico HTTP/1.1" 200 -
+2025-11-09 10:07:05,843 - werkzeug - INFO - 127.0.0.1 - - [09/Nov/2025 10:07:05] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-11-09 10:07:10,077 - werkzeug - INFO - 127.0.0.1 - - [09/Nov/2025 10:07:10] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-11-09 10:07:17,811 - werkzeug - INFO - 127.0.0.1 - - [09/Nov/2025 10:07:17] "GET /repos?repo=gulfofmexico HTTP/1.1" 200 -
+2025-11-09 10:07:17,857 - werkzeug - INFO - 127.0.0.1 - - [09/Nov/2025 10:07:17] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-11-09 10:07:28,501 - werkzeug - INFO - 127.0.0.1 - - [09/Nov/2025 10:07:28] "GET /repo?name=gulfofmexico HTTP/1.1" 200 -
+2025-11-09 10:07:28,545 - werkzeug - INFO - 127.0.0.1 - - [09/Nov/2025 10:07:28] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-11-09 10:07:34,834 - werkzeug - INFO -  * Detected change in '/home/jude/Nextcloud/Repos/nvidia-track-new/backend-jude/main.py', reloading
+2025-11-09 10:07:36,989 - werkzeug - INFO -  * Restarting with stat
+2025-11-09 10:07:41,784 - werkzeug - WARNING -  * Debugger is active!
+2025-11-09 10:07:41,785 - werkzeug - INFO -  * Debugger PIN: 176-499-935

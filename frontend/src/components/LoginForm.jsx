@@ -55,7 +55,7 @@ const LoginForm = () => {
         </form>
       </CardContent>
       <CardFooter className="flex-col gap-4">
-        <Button type="submit" className="bg-nvidia text-black w-full h-10">
+        <Button type="submit" className="bg-nvidia hover:bg-nvidia-hover text-black w-full h-10">
           Login
         </Button>
         {/* <Button variant="outline" className="w-full">

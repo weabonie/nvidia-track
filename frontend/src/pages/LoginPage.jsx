@@ -1,11 +1,15 @@
-const LoginPage = () => {
-    return (
-        <div className="w-full max-w-sm">
-            <div>
+import LoginForm from "../components/LoginForm";
 
-            </div>
+const LoginPage = () => {
+  return (
+    <div className="w-full h-full">
+      <div className="w-1/2 min-h-svh bg-black flex flex-col justify-center items-center">
+        <div>
+            <LoginForm/>
         </div>
-    )
-}
+      </div>
+    </div>
+  );
+};
 
 export default LoginPage;

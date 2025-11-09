@@ -7,7 +7,7 @@ import {
 } from "react-router-dom";
 
 import Home from "./pages/Home";
-import Layout from './Layout'
+import Layout from './components/Layout'
 import LoginPage from './pages/LoginPage'
 
 // import Login from './pages/auth/Login';
@@ -37,6 +37,25 @@ const router = createBrowserRouter([
   {
     path: '/login',
     element: <LoginPage />,
+  },
+
+   {
+    path: "/projects",
+    element: <Layout />,
+    children: [
+      {
+        index: true, // This makes Home the default child route for '/'
+        element: <Home />,
+      },
+      // {
+      //   path: 'about',
+      //   element: <About />,
+      // },
+      // {
+      //   path: 'contact',
+      //   element: <Contact />,
+      // },
+    ],
   },
 ]);
 

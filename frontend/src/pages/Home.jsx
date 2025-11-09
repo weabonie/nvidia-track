@@ -1,10 +1,11 @@
 import { Link } from "react-router-dom";
+import TypingText from "../components/TypingText"
 
 const Home = () => {
   return (
     <div className="w-full">
       {/* Hero Section - Full Viewport */}
-      <section className="relative bg-black min-h-[calc(100vh-5rem)] flex items-center justify-center overflow-hidden">
+      <section className="relative bg-black min-h-[calc(100vh-5rem)] flex py-12 justify-center overflow-hidden">
         {/* Optimized Background */}
         <div className="absolute inset-0">
           <div 
@@ -21,44 +22,32 @@ const Home = () => {
         </div>
         
         {/* Hero Content - Z-Pattern Layout */}
-        <div className="relative max-w-5xl mx-auto text-center px-6 py-20 z-10">
-          {/* Trust Badge */}
-          <div 
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#76B900]/10 border border-[#76B900]/20 mb-8 animate-fade-in opacity-0"
-            style={{ animationDelay: "0s" }}
-          >
-            <svg className="w-4 h-4 text-[#76B900]" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-            </svg>
-            <span className="text-sm text-gray-300 font-medium">Trusted by 10,000+ developers</span>
-          </div>
-
+        <div className="relative w-[90%] max-w-8xl mx-auto text-left px-2 z-10">
           {/* Main Headline - Clear Value Prop */}
           <h1
-            className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold leading-tight mb-6 animate-fade-in-up opacity-0"
+            className="flex flex-col space-y-2 text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-normal! leading-tight mb-6 animate-fade-in-up opacity-0"
             style={{ animationDelay: "0.1s" }}
           >
-            <span className="text-white">Track GPUs.</span>
-            <br />
-            <span className="text-[#76B900]">Boost Performance.</span>
+            <span className="text-[#76B900]">Say hello to your</span>
+            <span className="text-white">AI-Powered <TypingText words={["Project Management Assistant.", "Coding Assistant.", "Design Assistant.", "Research Assistant."]} typingSpeed={80} deletingSpeed={40} pause={1400} className="text-white inline-block" /></span>
           </h1>
 
           {/* Subheadline - Benefit-Driven */}
           <p
-            className="text-lg sm:text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto mb-10 leading-relaxed animate-fade-in-up opacity-0"
+            className="text-lg text-left sm:text-xl md:text-2xl text-gray-300 mx-auto mb-10 leading-relaxed animate-fade-in-up opacity-0"
             style={{ animationDelay: "0.2s" }}
           >
-            Real-time GPU monitoring with actionable insights to optimize your AI workloads
+            Where productivity meets intelligence.
           </p>
 
           {/* Primary CTA */}
           <div
-            className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in-up opacity-0"
+            className="flex flex-col sm:flex-row gap-4 animate-fade-in-up opacity-0"
             style={{ animationDelay: "0.3s" }}
           >
             <Link 
               to={"/login"} 
-              className="group bg-[#76B900] text-white px-10 py-4 rounded-lg font-semibold hover:bg-[#5d9100] transition-all duration-300 transform hover:scale-105 text-lg shadow-2xl hover:shadow-[#76B900]/50 w-full sm:w-auto"
+              className="group bg-[#76B900] text-white px-10 py-4 rounded-lg font-semibold hover:bg-[#5d9100] transition-all duration-300 transform hover:scale-105 text-lg shadow-md hover:shadow-[#76B900]/50 w-full sm:w-auto"
             >
               Get Started Free
               <svg className="inline-block ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -74,7 +63,7 @@ const Home = () => {
           </div>
 
           {/* Social Proof Indicators */}
-          <div 
+          {/* <div 
             className="flex flex-wrap justify-center items-center gap-8 mt-16 animate-fade-in opacity-0"
             style={{ animationDelay: "0.4s" }}
           >
@@ -92,7 +81,7 @@ const Home = () => {
               <div className="text-3xl font-bold text-[#76B900]">&lt;100ms</div>
               <div className="text-sm text-gray-400">Response Time</div>
             </div>
-          </div>
+          </div> */}
         </div>
       </section>
 

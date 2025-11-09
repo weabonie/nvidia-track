@@ -1,4 +1,5 @@
 import * as React from "react"
+import { useState, useEffect } from "react"
 import ProjectCard from "../components/ProjectCard"
 
 const sampleProjects = [
@@ -76,7 +77,40 @@ const sampleProjects = [
     },
 ]
 
+const SkeletonCard = () => {
+    return (
+        <div className="min-h-[200px] border border-[#363636] rounded-sm p-6 bg-[#0a0a0a] flex flex-col justify-between animate-pulse">
+            <div>
+                <div className="h-6 bg-gray-800 rounded w-3/4 mb-2"></div>
+                <div className="h-4 bg-gray-800 rounded w-full mb-1"></div>
+                <div className="h-4 bg-gray-800 rounded w-5/6"></div>
+                
+                <div className="flex gap-2 mt-4">
+                    <div className="h-6 w-16 bg-gray-800 rounded"></div>
+                    <div className="h-6 w-20 bg-gray-800 rounded"></div>
+                    <div className="h-6 w-16 bg-gray-800 rounded"></div>
+                </div>
+            </div>
+            
+            <div className="flex justify-between items-center mt-4">
+                <div className="h-3 bg-gray-800 rounded w-24"></div>
+            </div>
+        </div>
+    )
+}
+
 const Dashboard = () => {
+    const [isLoading, setIsLoading] = useState(true)
+
+    useEffect(() => {
+        // Simulate loading delay
+        const timer = setTimeout(() => {
+            setIsLoading(false)
+        }, 1200) // 1.2 seconds loading
+
+        return () => clearTimeout(timer)
+    }, [])
+
     return (
         <div className="p-12 animate-fade-in">
             <div className="flex items-center justify-between mb-6 animate-slide-down opacity-0" style={{ animationDelay: "0.1s" }}>
@@ -84,15 +118,29 @@ const Dashboard = () => {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {sampleProjects.map((p, index) => (
-                    <div 
-                        key={p.id} 
-                        className="animate-scale-in opacity-0" 
-                        style={{ animationDelay: `${0.2 + (index * 0.1)}s` }}
-                    >
-                        <ProjectCard project={p} />
-                    </div>
-                ))}
+                {isLoading ? (
+                    // Show skeleton cards while loading
+                    Array.from({ length: 8 }).map((_, index) => (
+                        <div 
+                            key={`skeleton-${index}`}
+                            className="animate-fade-in"
+                            style={{ animationDelay: `${index * 0.05}s` }}
+                        >
+                            <SkeletonCard />
+                        </div>
+                    ))
+                ) : (
+                    // Show actual project cards after loading
+                    sampleProjects.map((p, index) => (
+                        <div 
+                            key={p.id} 
+                            className="animate-scale-in opacity-0" 
+                            style={{ animationDelay: `${0.1 + (index * 0.05)}s` }}
+                        >
+                            <ProjectCard project={p} />
+                        </div>
+                    ))
+                )}
             </div>
         </div>
     )

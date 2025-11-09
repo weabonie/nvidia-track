@@ -23,7 +23,7 @@ const Home = () => {
             className="flex justify-center animate-fade-in-up opacity-0"
             style={{ animationDelay: "0.5s" }}
           >
-            <button className="bg-white text-black px-10 py-4 rounded-lg font-semibold hover:bg-[#76B900] hover:text-black transition-all transform hover:scale-105 text-lg shadow-lg border-2 border-white hover:border-[#76B900]">
+            <button className="bg-[#76B900] text-white px-10 py-4 rounded-lg font-semibold hover:bg-[#5d9100] hover:text-white transition-all transform hover:scale-105 text-lg shadow-lg border-2 border-[#76B900] hover:border-[#5d9100]">
               Get Started
             </button>
           </div>

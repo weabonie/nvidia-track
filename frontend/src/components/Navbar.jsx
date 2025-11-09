@@ -32,7 +32,7 @@ const Navbar = () => {
 
           {/* CTA Button */}
           <div className="hidden md:block">
-            <button className="bg-white text-black px-8 py-2.5 rounded-lg font-semibold hover:bg-[#76B900] hover:text-black transition-all transform hover:scale-105 border-2 border-white hover:border-[#76B900]">
+            <button className="bg-[#76B900] text-white px-8 py-2.5 rounded-lg font-semibold hover:bg-[#5d9100] hover:text-white transition-all transform hover:scale-105 border-2 border-[#76B900] hover:border-[#5d9100]">
               Get Started
             </button>
           </div>
@@ -78,7 +78,7 @@ const Navbar = () => {
               <a href="#contact" className="text-sm font-medium hover:text-[#76B900] transition-colors uppercase tracking-wide">
                 Contact
               </a>
-              <button className="bg-white text-black px-6 py-2.5 rounded-lg font-semibold hover:bg-[#76B900] hover:text-black transition-all w-full mt-2 border-2 border-white hover:border-[#76B900]">
+              <button className="bg-[#76B900] text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-[#5d9100] hover:text-white transition-all w-full mt-2 border-2 border-[#76B900] hover:border-[#5d9100]">
                 Get Started
               </button>
             </div>

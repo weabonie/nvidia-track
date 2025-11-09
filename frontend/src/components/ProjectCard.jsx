@@ -27,7 +27,7 @@ const ProjectCard = ({ project = {} }) => {
 
   const handleNavigate = () => {
     const id = project.id ?? name.replace(/\s+/g, "-").toLowerCase()
-    navigate(`/projects/${id}`)
+    navigate(`/dashboard/projects/${id}`)
   }
 
   return (
@@ -54,7 +54,7 @@ const ProjectCard = ({ project = {} }) => {
               <button 
                 onClick={(e) => {
                   e.stopPropagation();
-                  navigate(`/projects/${project.id ?? name.replace(/\s+/g,'-').toLowerCase()}/settings`);
+                  navigate(`/dashboard/projects/${project.id ?? name.replace(/\s+/g,'-').toLowerCase()}/settings`);
                 }}
                 className="text-gray-400 hover:text-white transition-colors"
               >

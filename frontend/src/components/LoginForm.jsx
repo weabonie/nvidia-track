@@ -26,7 +26,7 @@ const LoginForm = () => {
     
     // Wait for animation to complete before navigating
     setTimeout(() => {
-      navigate('/projects');
+      navigate('/dashboard');
     }, 800);
   };
 

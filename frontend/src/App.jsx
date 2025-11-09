@@ -24,48 +24,43 @@ const router = createBrowserRouter([
     element: <Layout />,
     children: [
       {
-        index: true, // This makes Home the default child route for '/'
+        index: true,
         element: <Home />,
-      },
-      // {
-      //   path: 'about',
-      //   element: <About />,
-      // },
-      // {
-      //   path: 'contact',
-      //   element: <Contact />,
-      // },
+      }
     ],
   },
-  // You can add other top-level routes without the main layout here if needed
   {
     path: '/login',
     element: <LoginPage />,
   },
-
-   {
-    path: "/projects",
+  {
+    path: "/dashboard",
     element: <ProjectLayout />,
     children: [
       {
-        index: true, // This makes Home the default child route for '/'
+        index: true,
         element: <Dashboard />,
       },
       {
-        path: ":id",
-        element: <ProjectOverview />,
+        path: "projects/:id/*",
+        element: <ProjectDetails />,
+      },
+      {
+        path: "templates",
+        element: <div className="p-8 text-white">Templates Coming Soon</div>,
+      },
+      {
+        path: "team",
+        element: <div className="p-8 text-white">Team Management Coming Soon</div>,
       },
       // {
-      //   path: 'about',
-      //   element: <About />,
-      // },
-      // {
-      //   path: 'contact',
-      //   element: <Contact />,
+      //   path: "integrations",
+      //   element: <div className="p-0"><React.Suspense fallback={<div className='p-8 text-white'>Loading Integrations...</div>}><IntegrationsLazy /></React.Suspense></div>,
       // },
     ],
   },
 ]);
+const IntegrationsLazy = React.lazy(() => import('./pages/Integrations'));
 
 function App({ routes }) {
   return (

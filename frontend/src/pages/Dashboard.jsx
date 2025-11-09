@@ -1,89 +1,8 @@
 import * as React from "react";
 import { useState, useEffect } from "react";
+import axios from "axios";
 import ProjectCard from "../components/ProjectCard";
-
-const sampleProjects = [
-  {
-    id: 2,
-    name: "collab-hub",
-    description:
-      "AI-powered team collaboration dashboard that helps hackathon teams brainstorm, assign tasks, and track progress in real time.",
-    updatedAt: "1 day ago",
-    link: "#",
-    tech: ["React", "Vite", "Tailwind", "Express", "OpenAI API"],
-    visibility: "public",
-  },
-  {
-    id: 3,
-    name: "taskgenie",
-    description:
-      "Generates and prioritizes hackathon tasks using AI — just describe your project, and it builds the roadmap for you.",
-    updatedAt: "3 hours ago",
-    link: "#",
-    tech: ["React", "Vite", "Tailwind", "FastAPI", "OpenAI API"],
-    visibility: "public",
-  },
-  {
-    id: 4,
-    name: "buildpulse",
-    description:
-      "A smart analytics dashboard that visualizes team performance, code commits, and sprint velocity during hackathons.",
-    updatedAt: "5 hours ago",
-    link: "#",
-    tech: ["React", "Vite", "Chart.js", "Node.js"],
-    visibility: "public",
-  },
-  {
-    id: 5,
-    name: "hackmap",
-    description:
-      "Interactive real-time map showing global hackathon events, projects, and team stats powered by open APIs.",
-    updatedAt: "4 days ago",
-    link: "#",
-    tech: ["React", "Vite", "Leaflet", "Supabase"],
-    visibility: "public",
-  },
-  {
-    id: 6,
-    name: "promptboard",
-    description:
-      "A shared AI prompt board for brainstorming ideas and generating creative solutions during hackathons.",
-    updatedAt: "6 hours ago",
-    link: "#",
-    tech: ["React", "Vite", "Firebase", "Tailwind"],
-    visibility: "public",
-  },
-  {
-    id: 7,
-    name: "visionify",
-    description:
-      "Computer vision demo app that detects objects and tracks team equipment using live webcam feeds.",
-    updatedAt: "3 days ago",
-    link: "#",
-    tech: ["React", "TensorFlow.js", "Vite", "Tailwind"],
-    visibility: "public",
-  },
-  {
-    id: 8,
-    name: "devsync",
-    description:
-      "Lightweight hub for syncing commits, tasks, and chat messages across GitHub, Slack, and Trello in one interface.",
-    updatedAt: "8 hours ago",
-    link: "#",
-    tech: ["React", "Vite", "Tailwind", "GraphQL"],
-    visibility: "public",
-  },
-  {
-    id: 9,
-    name: "aura-note",
-    description:
-      "AI mood-based journaling app that helps teams reflect and stay motivated throughout the hackathon.",
-    updatedAt: "2 days ago",
-    link: "#",
-    tech: ["React", "Vite", "Tailwind", "Flask"],
-    visibility: "public",
-  },
-];
+import DeployModal from "../components/DeployModal";
 
 const SkeletonCard = () => {
   return (
@@ -109,28 +28,75 @@ const SkeletonCard = () => {
 
 const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
+  const [projects, setProjects] = useState([]);
+  const [error, setError] = useState(null);
+  const [activeSection, setActiveSection] = useState("projects");
+  const [showDeployModal, setShowDeployModal] = useState(false);
 
   useEffect(() => {
-    // Simulate loading delay
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1200); // 1.2 seconds loading
+    const fetchProjects = async () => {
+      try {
+        const response = await axios.get("https://apihackutd.siru.dev/repos");
+        const formattedProjects = response.data.map((project) => ({
+          id: project.id,
+          name: project.name,
+          description: project.description || "No description provided",
+          updatedAt: "Recently updated",
+          tech: project.languages || [],
+          visibility: project.private ? "private" : "public",
+          link: project.html_url,
+        }));
+        setProjects(formattedProjects);
+        setIsLoading(false);
+      } catch (err) {
+        console.error("Error fetching projects:", err);
+        setError("Failed to load projects");
+        setIsLoading(false);
+      }
+    };
 
-    return () => clearTimeout(timer);
+    fetchProjects();
   }, []);
 
   return (
-    <div className="p-12 animate-fade-in">
-      <div
-        className="flex items-center justify-between mb-6 animate-slide-down opacity-0"
-        style={{ animationDelay: "0.1s" }}
-      >
-        <h1 className="text-2xl text-nvidia font-semibold">Projects</h1>
-      </div>
+    <div className="animate-fade-in">
+      <div className="px-6 lg:px-8 max-w-7xl mx-auto">
+        <div
+          className="flex items-center justify-between mb-6 animate-slide-down opacity-0"
+          style={{ animationDelay: "0.1s" }}
+        >
+          <div className="py-6">
+            <h1 className="text-2xl text-white font-semibold mb-3">
+              My Projects
+            </h1>
+            <p className="text-sm text-gray-400">
+              Manage your documentation projects and track their status.
+            </p>
+          </div>
+          <button
+            onClick={() => setShowDeployModal(true)}
+            className="hidden md:flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-black bg-white hover:bg-gray-200 rounded-md transition-colors duration-150"
+          >
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 4v16m8-8H4"
+              />
+            </svg>
+            Deploy
+          </button>
+        </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {isLoading
-          ? // Show skeleton cards while loading
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {isLoading ? (
+            // Show skeleton cards while loading
             Array.from({ length: 8 }).map((_, index) => (
               <div
                 key={`skeleton-${index}`}
@@ -140,8 +106,17 @@ const Dashboard = () => {
                 <SkeletonCard />
               </div>
             ))
-          : // Show actual project cards after loading
-            sampleProjects.map((p, index) => (
+          ) : error ? (
+            <div className="col-span-full text-center text-red-400 py-12">
+              {error}
+            </div>
+          ) : projects.length === 0 ? (
+            <div className="col-span-full text-center text-gray-400 py-12">
+              No projects found
+            </div>
+          ) : (
+            // Show actual project cards after loading
+            projects.map((p, index) => (
               <div
                 key={p.id}
                 className="animate-scale-in opacity-0"
@@ -149,8 +124,12 @@ const Dashboard = () => {
               >
                 <ProjectCard project={p} />
               </div>
-            ))}
+            ))
+          )}
+        </div>
       </div>
+
+      <DeployModal isOpen={showDeployModal} onClose={() => setShowDeployModal(false)} />
     </div>
   );
 };

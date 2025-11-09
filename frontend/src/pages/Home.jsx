@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import TypingText from "../components/TypingText"
+import { DeployPreview } from "../components/DeployPreview";
 
 const Home = () => {
   return (
@@ -47,9 +48,9 @@ const Home = () => {
           >
             <Link 
               to={"/login"} 
-              className="group bg-[#76B900] text-white px-10 py-4 rounded-lg font-semibold hover:bg-[#5d9100] transition-all duration-300 transform hover:scale-105 text-lg shadow-md hover:shadow-[#76B900]/50 w-full sm:w-auto"
+              className="group bg-[#76B900] text-black px-10 py-4 rounded-lg font-semibold hover:bg-[#5d9100] transition-all duration-300 transform hover:scale-105 text-lg shadow-md hover:shadow-[#76B900]/50 w-full sm:w-auto"
             >
-              Get Started Free
+              Get Started Now
               <svg className="inline-block ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>
@@ -180,30 +181,38 @@ const Home = () => {
 
       {/* Final CTA Section - Repeated Conversion */}
       <section className="bg-gradient-to-b from-gray-900 via-black to-black py-24 px-6 border-t border-gray-800">
-        <div className="max-w-4xl mx-auto text-center space-y-8">
-          <h2 className="text-4xl md:text-5xl font-bold text-white leading-tight">
-            <span className="text-[#76B900]">One-Link</span> Setup
-          </h2>
-          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-            Skip the setup. Just paste your GitHub repository link, and our multi-agent system takes care of the rest.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-            <Link 
-              to={"/login"} 
-              className="bg-[#76B900] text-white px-12 py-4 rounded-lg font-semibold hover:bg-[#5d9100] transition-all duration-300 transform hover:scale-105 text-lg shadow-2xl hover:shadow-[#76B900]/50"
-            >
-              Get Started Free
-            </Link>
-            <a 
-              href="mailto:contact@nvidiatrack.com" 
-              className="text-gray-300 px-12 py-4 rounded-lg font-semibold border-2 border-gray-700 hover:border-[#76B900] hover:text-white transition-all duration-300"
-            >
-              Contact Sales
-            </a>
+        <div className="max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div className="text-center md:text-left space-y-8">
+              <h2 className="text-4xl md:text-5xl font-bold text-white leading-tight">
+                <span className="text-[#76B900]">One-Link</span> Setup
+              </h2>
+              <p className="text-xl text-gray-300">
+                Skip the setup. Just paste your GitHub repository link, and our multi-agent system takes care of the rest.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+                <Link 
+                  to={"/login"} 
+                  className="bg-[#76B900] text-black px-12 py-4 rounded-lg font-semibold hover:bg-[#5d9100] transition-all duration-300 transform hover:scale-105 text-lg shadow-2xl hover:shadow-[#76B900]/50"
+                >
+                  Get Started Now
+                </Link>
+                <a 
+                  href="mailto:contact@nvidiatrack.com" 
+                  className="text-gray-300 px-12 py-4 rounded-lg font-semibold border-2 border-gray-700 hover:border-[#76B900] hover:text-white transition-all duration-300"
+                >
+                  Contact Sales
+                </a>
+              </div>
+              <p className="text-sm text-gray-500">
+                No credit card required • Free 14-day trial • Cancel anytime
+              </p>
+            </div>
+            <div className="relative">
+              <DeployPreview className="opacity-0 animate-fade-in-up" style={{ animationDelay: "0.2s" }} />
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent md:hidden"></div>
+            </div>
           </div>
-          <p className="text-sm text-gray-500">
-            No credit card required • Free 14-day trial • Cancel anytime
-          </p>
         </div>
       </section>
     </div>

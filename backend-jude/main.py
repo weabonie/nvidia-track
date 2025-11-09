@@ -527,10 +527,19 @@ def ingest():
                 full_repo_url = f"https://{repo_url}"
                 analysis_result = analysis.analyze_repo(full_repo_url, llm)
                 
-                # Extract pages from analysis result
-                if analysis_result and 'pages' in analysis_result:
+                # Extract pages from analysis result and validate quality
+                if analysis_result and 'pages' in analysis_result and len(analysis_result['pages']) > 0:
                     pages = analysis_result['pages']
-                    logger.info(f"[{request_id}] ✓ Deep analysis generated {len(pages)} pages")
+                    logger.info(f"[{request_id}] Deep analysis returned {len(pages)} pages")
+                    
+                    # Check if the pages are just generic/placeholder content
+                    # Look for telltale signs of bad generation like "0 file(s)" or "0 function(s)"
+                    first_page_desc = next(iter(pages.values())) if pages else ""
+                    if "0 file(s)" in first_page_desc or "0 function(s)" in first_page_desc or len(pages) < 3:
+                        logger.warning(f"[{request_id}] Deep analysis returned low-quality pages (generic/placeholder content). Falling back to LLM.")
+                        pages = get_pages(project_context, dependencies, llm)
+                    else:
+                        logger.info(f"[{request_id}] ✓ Deep analysis generated {len(pages)} quality pages")
                 else:
                     logger.warning(f"[{request_id}] Deep analysis returned but no pages found")
                     pages = get_pages(project_context, dependencies, llm)
@@ -620,13 +629,32 @@ def get_project_name(content: str, fallback_name: str, llm):
         structured_llm = llm.with_structured_output(ProjectName)
         prompt = ChatPromptTemplate.from_messages([
             ('system', '''You are a technical writer analyzing a real GitHub repository.
-            Extract the ACTUAL project name from the README (look for title, headers, or package.json name).
-            Create a proper human-readable name and a SPECIFIC description based on what you read.
-            DO NOT be generic - describe the actual unique features or purpose you see in the content.'''),
-            ('human', 'README Content:\n{content}\n\nFallback name: {fallback}')
+
+Your tasks:
+1. Extract the ACTUAL project name from the README, code comments, or infer from the repository
+2. Write a detailed, compelling description (2-4 sentences) of what this project IS and DOES
+
+NAME requirements:
+- Use the actual name if found in README headers, package.json, or code comments
+- If no clear name exists, create a human-readable name based on the project's purpose
+- Use Title Case for the name
+
+DESCRIPTION requirements:
+- Write in complete, natural sentences (not fragments or lists)
+- Be SPECIFIC about features, mechanics, or capabilities you can see in the code/structure
+- For games: Describe genre, gameplay, mechanics, visual elements, unique features
+- For apps: Describe purpose, key features, target users, and what problems it solves  
+- For libraries: Describe what it does, who uses it, and key capabilities
+- DO NOT use generic phrases like "A software project" or "An application"
+- Reference actual code features, file names, or technologies you observe
+
+Examples:
+- Name: "Castle of Time" / Description: "A 2D adventure game built in Unity featuring time-manipulation mechanics through a card-based system. Players navigate castle environments solving puzzles, with custom character controllers and animated combat sequences."
+- Name: "TaskFlow Pro" / Description: "A collaborative task management web application built with React and Node.js. Features real-time updates, team workspaces, customizable workflows, and integration with popular productivity tools."'''),
+            ('human', 'Project Content:\n{content}\n\nFallback name: {fallback}')
         ])
         chain = prompt | structured_llm
-        response = chain.invoke({ 'content': content[:3000], 'fallback': fallback_name })
+        response = chain.invoke({ 'content': content[:5000], 'fallback': fallback_name })
         logger.info(f"LLM response: name='{response.name}', description='{response.description[:100]}...'")
         return response
     except Exception as e:
@@ -644,16 +672,33 @@ def get_description(content: str, llm):
     
     structured_llm = llm.with_structured_output(Description)
     prompt = ChatPromptTemplate.from_messages([
-     ('system', '''You are a senior software engineer analyzing a REAL repository.
-     Read the actual content provided and describe what THIS SPECIFIC project does.
-     DO NOT give generic descriptions. Mention the actual features, technologies, or unique aspects you see.
-     Be specific and factual based on what you read.
-     
-     If the content is minimal, use the file structure and dependencies to infer the project type.'''),
+     ('system', '''You are a senior software engineer writing project documentation.
+
+Your task is to write a compelling, detailed description (2-4 sentences) of what THIS SPECIFIC project is and does.
+
+REQUIREMENTS:
+- Write in complete, natural sentences (not bullet points or lists)
+- Be SPECIFIC - mention actual features, gameplay mechanics, or unique aspects you see in the code/files
+- For games: Describe the genre, gameplay, mechanics, visual style, or unique features
+- For web apps: Describe the purpose, key features, tech stack, and what problems it solves
+- For libraries/tools: Describe what it does, who it's for, and key capabilities
+- DO NOT use generic phrases like "Specific Project Analysis" or "A software project"
+- DO NOT just list technologies - explain what the project DOES with them
+- If you see actual code or file names, reference specific features you can infer
+
+Example GOOD descriptions:
+- "A 2D platformer game built in Unity where players navigate through time-based puzzles using a card system to manipulate the environment. Features animated character controls, combat mechanics, and a unique visual style inspired by castle aesthetics."
+- "A real-time chat application built with React and WebSocket that enables secure messaging with end-to-end encryption. Includes user authentication, message history, and file sharing capabilities."
+- "A Python library for parsing and analyzing log files with support for multiple formats. Provides advanced filtering, statistical analysis, and customizable export options for DevOps teams."
+
+Example BAD descriptions (too generic):
+- "Specific Project Analysis"
+- "A Unity game project"
+- "A web application using React"'''),
      ('human', '{content}'),
     ])
     chain = prompt | structured_llm
-    response = chain.invoke({ 'content': content[:4000]})
+    response = chain.invoke({ 'content': content[:6000]})  # Increased from 4000 to give more context
     logger.info(f"LLM response: goal='{response.description[:100]}...'")
     return response
 
@@ -697,23 +742,57 @@ Code Samples:
         prompt = ChatPromptTemplate.from_messages([
             ('system', '''You are a technical documentation architect analyzing a REAL repository.
 
-Based on the ACTUAL files, code, and structure you see, create 5-8 documentation sections that make sense for THIS SPECIFIC project.
+Based on the ACTUAL files, code, and structure you see, create 7-10 comprehensive documentation sections that make sense for THIS SPECIFIC project.
 
 REQUIREMENTS:
-- You MUST create at least 5 distinct sections
+- You MUST create at least 7 distinct sections (aim for 8-10 for comprehensive coverage)
 - Base sections on what you ACTUALLY see in the code and files
-- Be SPECIFIC - reference actual files, features, or technologies you observe
+- Be SPECIFIC - reference actual files, classes, features, or technologies you observe
 - DO NOT use placeholder descriptions
 - DO NOT use markdown formatting in section titles (no **, __, *, etc.)
 - Use plain text for section titles (e.g., "Introduction" not "**Introduction**")
+- Each description should be 1-3 sentences explaining what that section will cover
 
 Section ideas based on project type:
-- For web apps: Introduction, Quick Start, Installation, Configuration, API Endpoints, Frontend Components, Deployment
-- For libraries: Introduction, Installation, Usage Guide, API Reference, Examples, Contributing
-- For CLI tools: Introduction, Installation, Commands Reference, Configuration, Examples
-- For games/creative: Introduction, Getting Started, Gameplay/Features, Controls, Technical Details
 
-Each section description should mention SPECIFIC files or features from this project.'''),
+For GAMES (Unity/Unreal/Godot):
+- Project Overview: What the game is about, genre, core concept
+- Getting Started: Opening the project, Unity version, initial setup
+- Game Features: Gameplay mechanics, systems, unique features (reference actual scripts)
+- Core Systems: Character controllers, physics, AI, input systems (reference actual .cs files)
+- Level Design: Scene structure, prefabs, environment setup
+- Art & Assets: Visual style, asset organization, materials, sprites
+- Audio System: Sound effects, music, audio management (if audio files present)
+- Scripts & Components: Key C# scripts and their purposes (reference actual script names)
+- Building & Deployment: How to build for different platforms
+- Troubleshooting: Common issues and solutions
+
+For WEB APPS (React/Vue/Next.js/Express):
+- Introduction: Purpose, target users, key value proposition
+- Quick Start: Fastest way to get running locally
+- Installation: Detailed setup with all dependencies
+- Architecture: Project structure, design patterns, key directories
+- Configuration: Environment variables, config files, API keys
+- Features: Core functionality with code examples
+- API Documentation: Endpoints, request/response examples (if backend present)
+- Components: Reusable UI components and their props (if frontend)
+- Database: Schema, models, migrations (if applicable)
+- Deployment: Hosting, CI/CD, production setup
+- Contributing: Development workflow, PR guidelines
+
+For LIBRARIES/TOOLS:
+- Introduction: What it does, who it's for
+- Installation: Package installation, dependencies
+- Quick Start: Simplest usage example
+- Usage Guide: Common use cases with examples
+- API Reference: Functions, classes, methods
+- Configuration: Options and customization
+- Advanced Features: Complex scenarios
+- Examples: Real-world use cases
+- Troubleshooting: Common issues
+- Contributing: How to contribute
+
+Each section description should mention SPECIFIC files, classes, or features from this project when possible.'''),
             ('human', '{context}')
         ])
         chain = prompt | structured_llm
@@ -732,18 +811,152 @@ Each section description should mention SPECIFIC files or features from this pro
         
         logger.info(f"Sanitized page titles: {list(sanitized_pages.keys())}")
         
-        # Ensure we have at least 4 sections
-        if len(sanitized_pages) < 4:
-            logger.warning("LLM returned too few pages, adding defaults")
-            default_pages = {
-                "Introduction": f"Overview of this project and its key features based on {', '.join(dependencies[:2])}.",
-                "Installation": "Step-by-step guide to setting up the project locally.",
-                "Configuration": "Details on configuration files and environment setup.",
-                "Usage Guide": "How to use the main features of this project."
-            }
-            response.pages = {**default_pages, **response.pages}
+        # Ensure we have at least 7 sections (add smart defaults based on project type)
+        if len(sanitized_pages) < 7:
+            logger.warning(f"LLM returned only {len(sanitized_pages)} pages, adding intelligent defaults")
+            
+            # Determine project type from dependencies
+            is_web_app = any(dep.lower() in ['react', 'vue', 'angular', 'next.js', 'express', 'node.js'] for dep in dependencies)
+            is_game = any(dep.lower() in ['unity', 'unreal', 'godot'] for dep in dependencies)
+            is_python = any(dep.lower() in ['python', 'flask', 'django', 'fastapi'] for dep in dependencies)
+            has_api = 'api' in ' '.join(project_context['file_structure']).lower() or 'express' in dependencies
+            has_config = len(project_context['config_files']) > 0
+            
+            # Detect specific file types for better defaults
+            has_scripts = any('.cs' in f or '.py' in f or '.js' in f for f in project_context['file_structure'])
+            has_assets = any('assets' in f.lower() or 'sprites' in f.lower() or 'textures' in f.lower() for f in project_context['file_structure'])
+            has_audio = any('.mp3' in f or '.wav' in f or '.ogg' in f for f in project_context['file_structure'])
+            has_scenes = any('.unity' in f or 'scenes' in f.lower() for f in project_context['file_structure'])
+            
+            # Build smart default pages based on project type
+            default_pages = {}
+            
+            # GAME PROJECT DEFAULTS (Unity/Unreal/Godot)
+            if is_game:
+                if "Project Overview" not in sanitized_pages and "Introduction" not in sanitized_pages:
+                    tech = dependencies[0] if dependencies else 'game engine'
+                    default_pages["Project Overview"] = f"Overview of this game project built with {tech}, including genre, core gameplay concept, and target platform."
+                
+                if "Getting Started" not in sanitized_pages and "Setup" not in sanitized_pages:
+                    default_pages["Getting Started"] = "Instructions for opening the project in the game engine, including required editor version and initial configuration."
+                
+                if "Game Features" not in sanitized_pages and "Gameplay" not in sanitized_pages and "Features" not in sanitized_pages:
+                    default_pages["Game Features"] = "Detailed description of gameplay mechanics, core systems, and unique features that make this game stand out."
+                
+                if has_scripts and "Core Systems" not in sanitized_pages and "Scripts" not in sanitized_pages:
+                    default_pages["Core Systems"] = "Documentation of key game systems including character controllers, game managers, input handling, and physics interactions."
+                
+                if has_scenes and "Level Design" not in sanitized_pages and "Scenes" not in sanitized_pages:
+                    default_pages["Level Design"] = "Overview of scene structure, level layouts, prefab organization, and environment design principles used in the game."
+                
+                if has_assets and "Art & Assets" not in sanitized_pages and "Assets" not in sanitized_pages:
+                    default_pages["Art & Assets"] = "Details on the visual style, sprite organization, materials, shaders, and asset pipeline used in the project."
+                
+                if has_audio and "Audio System" not in sanitized_pages and "Sound" not in sanitized_pages:
+                    default_pages["Audio System"] = "Documentation of sound effects, music implementation, audio mixing, and the audio management system."
+                
+                if "Building & Deployment" not in sanitized_pages and "Build" not in sanitized_pages and "Deployment" not in sanitized_pages:
+                    default_pages["Building & Deployment"] = "Instructions for building the game for different platforms (Windows, Mac, Linux, WebGL, mobile) and deployment considerations."
+                
+                if "Controls" not in sanitized_pages and "Input" not in sanitized_pages:
+                    default_pages["Controls"] = "Player control schemes, input mappings, keyboard/mouse/gamepad configurations, and accessibility options."
+                
+                if "Troubleshooting" not in sanitized_pages and "FAQ" not in sanitized_pages:
+                    default_pages["Troubleshooting"] = "Common issues developers may encounter when working with the project and their solutions."
+            
+            # WEB APP DEFAULTS (React/Vue/Next.js/Express)
+            elif is_web_app:
+                if "Introduction" not in sanitized_pages and "Overview" not in sanitized_pages:
+                    tech_list = ', '.join(dependencies[:3]) if dependencies else 'modern web technologies'
+                    default_pages["Introduction"] = f"Overview of this web application built with {tech_list}, its purpose, and key features."
+                
+                if "Quick Start" not in sanitized_pages and "Getting Started" not in sanitized_pages:
+                    default_pages["Quick Start"] = "The fastest way to get the application running locally for development."
+                
+                if "Installation" not in sanitized_pages and "Setup" not in sanitized_pages:
+                    default_pages["Installation"] = "Detailed installation instructions including all prerequisites, dependencies, and environment setup."
+                
+                if "Architecture" not in sanitized_pages and "Project Structure" not in sanitized_pages:
+                    default_pages["Architecture"] = "Overview of the project's architecture, directory structure, design patterns, and key organizational principles."
+                
+                if has_config and "Configuration" not in sanitized_pages:
+                    config_files = ', '.join(project_context['config_files'][:3])
+                    default_pages["Configuration"] = f"Configuration options, environment variables, and settings using {config_files}."
+                
+                if "Features" not in sanitized_pages and "Usage Guide" not in sanitized_pages:
+                    default_pages["Features"] = "Comprehensive guide to all features and functionality with usage examples and code snippets."
+                
+                if has_api and "API Documentation" not in sanitized_pages and "API" not in sanitized_pages:
+                    default_pages["API Documentation"] = "Complete API reference including all endpoints, request/response formats, authentication, and examples."
+                
+                if "Components" not in sanitized_pages and "UI Components" not in sanitized_pages:
+                    default_pages["Components"] = "Documentation of reusable UI components, their props, usage examples, and styling guidelines."
+                
+                if "Deployment" not in sanitized_pages and "Production" not in sanitized_pages:
+                    default_pages["Deployment"] = "Instructions for deploying to production, including hosting options, CI/CD pipelines, and environment configuration."
+                
+                if "Contributing" not in sanitized_pages and "Development" not in sanitized_pages:
+                    default_pages["Contributing"] = "Guidelines for contributing to the project, including development workflow, code standards, and pull request process."
+            
+            # PYTHON PROJECT DEFAULTS
+            elif is_python:
+                if "Introduction" not in sanitized_pages and "Overview" not in sanitized_pages:
+                    default_pages["Introduction"] = "Overview of this Python project, its purpose, and key capabilities."
+                
+                if "Installation" not in sanitized_pages and "Setup" not in sanitized_pages:
+                    default_pages["Installation"] = "Installation instructions including Python version requirements and dependency installation."
+                
+                if "Quick Start" not in sanitized_pages and "Getting Started" not in sanitized_pages:
+                    default_pages["Quick Start"] = "Quick start guide with basic usage examples to get up and running immediately."
+                
+                if "Usage Guide" not in sanitized_pages and "Usage" not in sanitized_pages:
+                    default_pages["Usage Guide"] = "Comprehensive usage guide with detailed examples and common use cases."
+                
+                if has_api and "API Reference" not in sanitized_pages and "API" not in sanitized_pages:
+                    default_pages["API Reference"] = "Complete API documentation including all functions, classes, methods, and their parameters."
+                
+                if "Configuration" not in sanitized_pages and has_config:
+                    default_pages["Configuration"] = "Configuration options, settings files, and environment variable documentation."
+                
+                if "Examples" not in sanitized_pages and "Code Examples" not in sanitized_pages:
+                    default_pages["Examples"] = "Real-world examples demonstrating various use cases and advanced features."
+                
+                if "Contributing" not in sanitized_pages:
+                    default_pages["Contributing"] = "Guidelines for contributing including development setup, testing, and code style."
+            
+            # GENERIC PROJECT DEFAULTS
+            else:
+                if "Introduction" not in sanitized_pages and "Overview" not in sanitized_pages:
+                    tech_list = ', '.join(dependencies[:3]) if dependencies else 'various technologies'
+                    default_pages["Introduction"] = f"Overview of this project built with {tech_list}."
+                
+                if "Installation" not in sanitized_pages and "Setup" not in sanitized_pages:
+                    default_pages["Installation"] = "Step-by-step installation and setup instructions."
+                
+                if "Usage Guide" not in sanitized_pages and "Quick Start" not in sanitized_pages:
+                    default_pages["Usage Guide"] = "Guide to using the main features of this project."
+                
+                if has_config and "Configuration" not in sanitized_pages:
+                    default_pages["Configuration"] = "Configuration options and settings."
+                
+                if "Examples" not in sanitized_pages:
+                    default_pages["Examples"] = "Practical usage examples and code snippets."
+                
+                if "Contributing" not in sanitized_pages:
+                    default_pages["Contributing"] = "Guidelines for contributing to the project."
+                
+                if "Deployment" not in sanitized_pages:
+                    default_pages["Deployment"] = "Deployment instructions and best practices."
+            
+            # Merge defaults with existing pages (existing pages take precedence)
+            merged_pages = {**default_pages, **sanitized_pages}
+            
+            logger.info(f"Added {len(default_pages)} default pages. Total pages: {len(merged_pages)}")
+            logger.info(f"Final page titles: {list(merged_pages.keys())}")
+            
+            return merged_pages
         
-        return response.pages
+        return sanitized_pages
     except Exception as e:
         logger.error(f"Could not generate pages: {e}", exc_info=True)
         return {

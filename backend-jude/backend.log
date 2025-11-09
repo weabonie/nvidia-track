@@ -335,3 +335,249 @@ fatal: unable to access 'https://https://github.com/Last-Minute-Games/game/': Co
 2025-11-09 14:03:45,004 - __main__ - INFO - [42497b90] Request completed successfully
 2025-11-09 14:03:45,118 - __main__ - INFO - [42497b90] Cleaned up temporary directory: tmp/30783b09-d762-451e-b12f-f9d8ca3b6ec6
 2025-11-09 14:03:45,118 - werkzeug - INFO - 127.0.0.1 - - [09/Nov/2025 14:03:45] "GET /ingest?repo_url=https://github.com/Last-Minute-Games/game HTTP/1.1" 200 -
+2025-11-09 14:33:50,545 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:3333
+ * Running on http://172.27.26.214:3333
+2025-11-09 14:33:50,545 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-11-09 14:33:50,546 - werkzeug - INFO -  * Restarting with stat
+2025-11-09 14:33:51,874 - werkzeug - WARNING -  * Debugger is active!
+2025-11-09 14:33:51,874 - werkzeug - INFO -  * Debugger PIN: 529-206-346
+2025-11-09 14:33:53,390 - __main__ - INFO - [523b02ed] New ingest request received
+2025-11-09 14:33:53,623 - __main__ - INFO - [523b02ed] Processing repository: github.com/Last-Minute-Games/game
+2025-11-09 14:33:53,623 - __main__ - INFO - [523b02ed] Cloning repository to tmp/a15a32bb-4fbd-41b3-872c-c4b25246322a...
+2025-11-09 14:33:57,039 - __main__ - INFO - [523b02ed] Repository cloned successfully
+2025-11-09 14:33:57,040 - __main__ - INFO - [523b02ed] Step 1/7: Detecting dependencies...
+2025-11-09 14:33:57,040 - __main__ - INFO - Starting dependency detection for: tmp/a15a32bb-4fbd-41b3-872c-c4b25246322a
+2025-11-09 14:33:57,055 - __main__ - INFO - Detected languages from file extensions: {'C#'}
+2025-11-09 14:33:57,055 - __main__ - INFO - Detected Unity version: 6000.2.2f1
+2025-11-09 14:33:57,055 - __main__ - INFO - Final dependencies detected: ['Unity 6000.2.2f1', 'C#']
+2025-11-09 14:33:57,055 - __main__ - INFO - [523b02ed] Step 2/7: Building project context...
+2025-11-09 14:33:57,056 - __main__ - INFO - Building comprehensive project context for: tmp/a15a32bb-4fbd-41b3-872c-c4b25246322a
+2025-11-09 14:33:57,056 - __main__ - INFO - Reading all markdown files...
+2025-11-09 14:33:57,072 - __main__ - INFO - Read 1 markdown files, total 52 characters
+2025-11-09 14:33:57,072 - __main__ - INFO - Scanning file structure...
+2025-11-09 14:33:57,087 - __main__ - INFO - Found 353 files in structure
+2025-11-09 14:33:57,087 - __main__ - INFO - Identifying main entry files...
+2025-11-09 14:33:57,132 - __main__ - INFO - Reading sample code from main files...
+2025-11-09 14:33:57,132 - __main__ - INFO - Identifying configuration files...
+2025-11-09 14:33:57,132 - __main__ - INFO - Project context built: 52 chars of docs, 353 files, 0 entry points, 0 config files
+2025-11-09 14:33:57,132 - __main__ - WARNING - [523b02ed] README is empty or minimal (52 chars), analyzing entire repo structure...
+2025-11-09 14:33:57,207 - __main__ - INFO - [523b02ed] Built intelligent synthetic context from repo analysis: 4395 chars, analyzed 3 code files
+2025-11-09 14:33:57,207 - __main__ - INFO - [523b02ed] Step 3/7: Extracting repo name...
+2025-11-09 14:33:57,207 - __main__ - INFO - [523b02ed] Repo name: game -> game
+2025-11-09 14:33:57,207 - __main__ - INFO - [523b02ed] Step 4/7: Calling LLM for project name and description...
+2025-11-09 14:33:57,207 - __main__ - INFO - LLM call: Extracting project name and description
+2025-11-09 14:34:01,746 - httpx - INFO - HTTP Request: POST http://204.52.27.251:11434/v1/chat/completions "HTTP/1.1 200 OK"
+2025-11-09 14:34:01,759 - __main__ - INFO - LLM response: name='Castle of Time', description='An interactive, Unity-built game featuring a character controller, animated elements, and a card-bas...'
+2025-11-09 14:34:01,760 - __main__ - INFO - [523b02ed] Step 5/7: Calling LLM for project goal...
+2025-11-09 14:34:01,760 - __main__ - INFO - LLM call: Extracting project goal/description
+2025-11-09 14:34:05,320 - httpx - INFO - HTTP Request: POST http://204.52.27.251:11434/v1/chat/completions "HTTP/1.1 200 OK"
+2025-11-09 14:34:05,328 - __main__ - INFO - LLM response: goal='Specific Project Analysis...'
+2025-11-09 14:34:05,328 - __main__ - INFO - [523b02ed] Step 6/8: Calling LLM for installation steps...
+2025-11-09 14:34:05,328 - __main__ - INFO - LLM call: Generating installation steps
+2025-11-09 14:34:12,407 - httpx - INFO - HTTP Request: POST http://204.52.27.251:11434/v1/chat/completions "HTTP/1.1 200 OK"
+2025-11-09 14:34:12,415 - __main__ - INFO - LLM generated 5 installation steps
+2025-11-09 14:34:12,415 - __main__ - INFO - [523b02ed] Step 7/8: Generating documentation pages...
+2025-11-09 14:34:12,415 - __main__ - INFO - [523b02ed] Starting deep code analysis (tree-sitter + LLM)...
+2025-11-09 14:34:16,034 - __main__ - INFO - [523b02ed] ✓ Deep analysis generated 1 pages
+2025-11-09 14:34:16,034 - __main__ - INFO - [523b02ed] Constructing final result...
+2025-11-09 14:34:16,034 - __main__ - INFO - [523b02ed] Result constructed with 1 documentation pages
+2025-11-09 14:34:16,034 - __main__ - INFO - [523b02ed] Sending to documentation generator: http://204.52.26.255:8080/generate-docs
+2025-11-09 14:36:02,093 - __main__ - INFO - [523b02ed] Documentation generator response status: 200
+2025-11-09 14:36:02,093 - __main__ - INFO - [523b02ed] Documentation generated successfully!
+2025-11-09 14:36:02,093 - __main__ - INFO - [523b02ed] Request completed successfully
+2025-11-09 14:36:02,196 - __main__ - INFO - [523b02ed] Cleaned up temporary directory: tmp/a15a32bb-4fbd-41b3-872c-c4b25246322a
+2025-11-09 14:36:02,197 - werkzeug - INFO - 127.0.0.1 - - [09/Nov/2025 14:36:02] "GET /ingest?repo_url=https://github.com/Last-Minute-Games/game&deep_analysis=true HTTP/1.1" 200 -
+2025-11-09 14:37:42,621 - werkzeug - INFO -  * Detected change in '/home/ubuntu/test2/nvidia-track/backend-jude/main.py', reloading
+2025-11-09 14:37:42,797 - werkzeug - INFO -  * Restarting with stat
+2025-11-09 14:37:44,117 - werkzeug - WARNING -  * Debugger is active!
+2025-11-09 14:37:44,118 - werkzeug - INFO -  * Debugger PIN: 529-206-346
+2025-11-09 14:38:09,385 - werkzeug - INFO -  * Detected change in '/home/ubuntu/test2/nvidia-track/backend-jude/main.py', reloading
+2025-11-09 14:38:09,528 - werkzeug - INFO -  * Restarting with stat
+2025-11-09 14:38:10,843 - werkzeug - WARNING -  * Debugger is active!
+2025-11-09 14:38:10,844 - werkzeug - INFO -  * Debugger PIN: 529-206-346
+2025-11-09 14:41:18,668 - werkzeug - INFO -  * Detected change in '/home/ubuntu/test2/nvidia-track/backend-jude/main.py', reloading
+2025-11-09 14:41:18,831 - werkzeug - INFO -  * Restarting with stat
+2025-11-09 14:41:20,158 - werkzeug - WARNING -  * Debugger is active!
+2025-11-09 14:41:20,158 - werkzeug - INFO -  * Debugger PIN: 529-206-346
+2025-11-09 14:41:39,362 - werkzeug - INFO -  * Detected change in '/home/ubuntu/test2/nvidia-track/backend-jude/main.py', reloading
+2025-11-09 14:41:39,509 - werkzeug - INFO -  * Restarting with stat
+2025-11-09 14:41:40,814 - werkzeug - WARNING -  * Debugger is active!
+2025-11-09 14:41:40,814 - werkzeug - INFO -  * Debugger PIN: 529-206-346
+2025-11-09 14:41:51,825 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:3333
+ * Running on http://172.27.26.214:3333
+2025-11-09 14:41:51,825 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-11-09 14:41:51,825 - werkzeug - INFO -  * Restarting with stat
+2025-11-09 14:41:53,159 - werkzeug - WARNING -  * Debugger is active!
+2025-11-09 14:41:53,159 - werkzeug - INFO -  * Debugger PIN: 529-206-346
+2025-11-09 14:41:53,169 - __main__ - INFO - [c24e0683] New ingest request received
+2025-11-09 14:41:53,397 - __main__ - INFO - [c24e0683] Processing repository: github.com/Last-Minute-Games/game
+2025-11-09 14:41:53,397 - __main__ - INFO - [c24e0683] Cloning repository to tmp/11ee0a6d-fb4f-423a-8f50-009dd1e2a43a...
+2025-11-09 14:41:56,740 - __main__ - INFO - [c24e0683] Repository cloned successfully
+2025-11-09 14:41:56,741 - __main__ - INFO - [c24e0683] Step 1/7: Detecting dependencies...
+2025-11-09 14:41:56,741 - __main__ - INFO - Starting dependency detection for: tmp/11ee0a6d-fb4f-423a-8f50-009dd1e2a43a
+2025-11-09 14:41:56,750 - __main__ - INFO - Detected languages from file extensions: {'C#'}
+2025-11-09 14:41:56,750 - __main__ - INFO - Detected Unity version: 6000.2.2f1
+2025-11-09 14:41:56,751 - __main__ - INFO - Final dependencies detected: ['Unity 6000.2.2f1', 'C#']
+2025-11-09 14:41:56,751 - __main__ - INFO - [c24e0683] Step 2/7: Building project context...
+2025-11-09 14:41:56,751 - __main__ - INFO - Building comprehensive project context for: tmp/11ee0a6d-fb4f-423a-8f50-009dd1e2a43a
+2025-11-09 14:41:56,751 - __main__ - INFO - Reading all markdown files...
+2025-11-09 14:41:56,762 - __main__ - INFO - Read 1 markdown files, total 52 characters
+2025-11-09 14:41:56,762 - __main__ - INFO - Scanning file structure...
+2025-11-09 14:41:56,771 - __main__ - INFO - Found 353 files in structure
+2025-11-09 14:41:56,771 - __main__ - INFO - Identifying main entry files...
+2025-11-09 14:41:56,815 - __main__ - INFO - Reading sample code from main files...
+2025-11-09 14:41:56,815 - __main__ - INFO - Identifying configuration files...
+2025-11-09 14:41:56,815 - __main__ - INFO - Project context built: 52 chars of docs, 353 files, 0 entry points, 0 config files
+2025-11-09 14:41:56,815 - __main__ - WARNING - [c24e0683] README is empty or minimal (52 chars), analyzing entire repo structure...
+2025-11-09 14:41:56,888 - __main__ - INFO - [c24e0683] Built intelligent synthetic context from repo analysis: 4395 chars, analyzed 3 code files
+2025-11-09 14:41:56,888 - __main__ - INFO - [c24e0683] Step 3/7: Extracting repo name...
+2025-11-09 14:41:56,888 - __main__ - INFO - [c24e0683] Repo name: game -> game
+2025-11-09 14:41:56,888 - __main__ - INFO - [c24e0683] Step 4/7: Calling LLM for project name and description...
+2025-11-09 14:41:56,888 - __main__ - INFO - LLM call: Extracting project name and description
+2025-11-09 14:42:08,300 - httpx - INFO - HTTP Request: POST http://204.52.27.251:11434/v1/chat/completions "HTTP/1.1 200 OK"
+2025-11-09 14:42:08,313 - __main__ - INFO - LLM response: name='Castle of Time', description='...'
+2025-11-09 14:42:08,313 - __main__ - INFO - [c24e0683] Step 5/7: Calling LLM for project goal...
+2025-11-09 14:42:08,313 - __main__ - INFO - LLM call: Extracting project goal/description
+2025-11-09 14:42:14,481 - httpx - INFO - HTTP Request: POST http://204.52.27.251:11434/v1/chat/completions "HTTP/1.1 200 OK"
+2025-11-09 14:42:14,489 - __main__ - INFO - LLM response: goal='A time-manipulation puzzle game built in Unity, where players navigate through increasingly complex ...'
+2025-11-09 14:42:14,489 - __main__ - INFO - [c24e0683] Step 6/8: Calling LLM for installation steps...
+2025-11-09 14:42:14,489 - __main__ - INFO - LLM call: Generating installation steps
+2025-11-09 14:42:21,550 - httpx - INFO - HTTP Request: POST http://204.52.27.251:11434/v1/chat/completions "HTTP/1.1 200 OK"
+2025-11-09 14:42:21,558 - __main__ - INFO - LLM generated 5 installation steps
+2025-11-09 14:42:21,558 - __main__ - INFO - [c24e0683] Step 7/8: Generating documentation pages...
+2025-11-09 14:42:21,558 - __main__ - INFO - [c24e0683] Starting deep code analysis (tree-sitter + LLM)...
+2025-11-09 14:42:25,076 - __main__ - INFO - [c24e0683] ✓ Deep analysis generated 1 pages
+2025-11-09 14:42:25,076 - __main__ - INFO - [c24e0683] Constructing final result...
+2025-11-09 14:42:25,076 - __main__ - INFO - [c24e0683] Result constructed with 1 documentation pages
+2025-11-09 14:42:25,076 - __main__ - INFO - [c24e0683] Sending to documentation generator: http://204.52.26.255:8080/generate-docs
+2025-11-09 14:42:42,794 - werkzeug - INFO -  * Detected change in '/home/ubuntu/test2/nvidia-track/backend-jude/main.py', reloading
+2025-11-09 14:42:42,995 - werkzeug - INFO -  * Restarting with stat
+2025-11-09 14:42:44,361 - werkzeug - WARNING -  * Debugger is active!
+2025-11-09 14:42:44,361 - werkzeug - INFO -  * Debugger PIN: 529-206-346
+2025-11-09 14:43:39,956 - werkzeug - INFO -  * Detected change in '/home/ubuntu/test2/nvidia-track/backend-jude/main.py', reloading
+2025-11-09 14:43:40,114 - werkzeug - INFO -  * Restarting with stat
+2025-11-09 14:43:41,457 - werkzeug - WARNING -  * Debugger is active!
+2025-11-09 14:43:41,457 - werkzeug - INFO -  * Debugger PIN: 529-206-346
+2025-11-09 14:44:31,011 - werkzeug - INFO -  * Detected change in '/home/ubuntu/test2/nvidia-track/backend-jude/main.py', reloading
+2025-11-09 14:44:31,164 - werkzeug - INFO -  * Restarting with stat
+2025-11-09 14:44:32,514 - werkzeug - WARNING -  * Debugger is active!
+2025-11-09 14:44:32,514 - werkzeug - INFO -  * Debugger PIN: 529-206-346
+2025-11-09 14:44:44,648 - werkzeug - INFO -  * Detected change in '/home/ubuntu/test2/nvidia-track/backend-jude/main.py', reloading
+2025-11-09 14:44:44,797 - werkzeug - INFO -  * Restarting with stat
+2025-11-09 14:44:46,112 - werkzeug - WARNING -  * Debugger is active!
+2025-11-09 14:44:46,112 - werkzeug - INFO -  * Debugger PIN: 529-206-346
+2025-11-09 14:44:51,947 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:3333
+ * Running on http://172.27.26.214:3333
+2025-11-09 14:44:51,948 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-11-09 14:44:51,948 - werkzeug - INFO -  * Restarting with stat
+2025-11-09 14:44:53,256 - werkzeug - WARNING -  * Debugger is active!
+2025-11-09 14:44:53,256 - werkzeug - INFO -  * Debugger PIN: 529-206-346
+2025-11-09 14:44:53,270 - __main__ - INFO - [5c1d6d2f] New ingest request received
+2025-11-09 14:44:53,499 - __main__ - INFO - [5c1d6d2f] Processing repository: github.com/Last-Minute-Games/game
+2025-11-09 14:44:53,499 - __main__ - INFO - [5c1d6d2f] Cloning repository to tmp/e96b8e7a-9273-4556-bec7-c65615386f49...
+2025-11-09 14:44:56,779 - __main__ - INFO - [5c1d6d2f] Repository cloned successfully
+2025-11-09 14:44:56,780 - __main__ - INFO - [5c1d6d2f] Step 1/7: Detecting dependencies...
+2025-11-09 14:44:56,780 - __main__ - INFO - Starting dependency detection for: tmp/e96b8e7a-9273-4556-bec7-c65615386f49
+2025-11-09 14:44:56,797 - __main__ - INFO - Detected languages from file extensions: {'C#'}
+2025-11-09 14:44:56,797 - __main__ - INFO - Detected Unity version: 6000.2.2f1
+2025-11-09 14:44:56,797 - __main__ - INFO - Final dependencies detected: ['Unity 6000.2.2f1', 'C#']
+2025-11-09 14:44:56,797 - __main__ - INFO - [5c1d6d2f] Step 2/7: Building project context...
+2025-11-09 14:44:56,797 - __main__ - INFO - Building comprehensive project context for: tmp/e96b8e7a-9273-4556-bec7-c65615386f49
+2025-11-09 14:44:56,797 - __main__ - INFO - Reading all markdown files...
+2025-11-09 14:44:56,816 - __main__ - INFO - Read 1 markdown files, total 52 characters
+2025-11-09 14:44:56,816 - __main__ - INFO - Scanning file structure...
+2025-11-09 14:44:56,829 - __main__ - INFO - Found 353 files in structure
+2025-11-09 14:44:56,829 - __main__ - INFO - Identifying main entry files...
+2025-11-09 14:44:56,876 - __main__ - INFO - Reading sample code from main files...
+2025-11-09 14:44:56,876 - __main__ - INFO - Identifying configuration files...
+2025-11-09 14:44:56,876 - __main__ - INFO - Project context built: 52 chars of docs, 353 files, 0 entry points, 0 config files
+2025-11-09 14:44:56,877 - __main__ - WARNING - [5c1d6d2f] README is empty or minimal (52 chars), analyzing entire repo structure...
+2025-11-09 14:44:56,952 - __main__ - INFO - [5c1d6d2f] Built intelligent synthetic context from repo analysis: 4395 chars, analyzed 3 code files
+2025-11-09 14:44:56,952 - __main__ - INFO - [5c1d6d2f] Step 3/7: Extracting repo name...
+2025-11-09 14:44:56,953 - __main__ - INFO - [5c1d6d2f] Repo name: game -> game
+2025-11-09 14:44:56,953 - __main__ - INFO - [5c1d6d2f] Step 4/7: Calling LLM for project name and description...
+2025-11-09 14:44:56,953 - __main__ - INFO - LLM call: Extracting project name and description
+2025-11-09 14:45:01,282 - httpx - INFO - HTTP Request: POST http://204.52.27.251:11434/v1/chat/completions "HTTP/1.1 200 OK"
+2025-11-09 14:45:01,295 - __main__ - INFO - LLM response: name='Castle of Time', description='...'
+2025-11-09 14:45:01,295 - __main__ - INFO - [5c1d6d2f] Step 5/7: Calling LLM for project goal...
+2025-11-09 14:45:01,295 - __main__ - INFO - LLM call: Extracting project goal/description
+2025-11-09 14:45:07,466 - httpx - INFO - HTTP Request: POST http://204.52.27.251:11434/v1/chat/completions "HTTP/1.1 200 OK"
+2025-11-09 14:45:07,473 - __main__ - INFO - LLM response: goal='A time-manipulation puzzle game built in Unity, where players navigate through increasingly complex ...'
+2025-11-09 14:45:07,474 - __main__ - INFO - [5c1d6d2f] Step 6/8: Calling LLM for installation steps...
+2025-11-09 14:45:07,474 - __main__ - INFO - LLM call: Generating installation steps
+2025-11-09 14:45:14,543 - httpx - INFO - HTTP Request: POST http://204.52.27.251:11434/v1/chat/completions "HTTP/1.1 200 OK"
+2025-11-09 14:45:14,551 - __main__ - INFO - LLM generated 5 installation steps
+2025-11-09 14:45:14,551 - __main__ - INFO - [5c1d6d2f] Step 7/8: Generating documentation pages...
+2025-11-09 14:45:14,551 - __main__ - INFO - [5c1d6d2f] Starting deep code analysis (tree-sitter + LLM)...
+2025-11-09 14:45:17,973 - __main__ - INFO - [5c1d6d2f] ✓ Deep analysis generated 1 pages
+2025-11-09 14:45:17,973 - __main__ - INFO - [5c1d6d2f] Constructing final result...
+2025-11-09 14:45:17,973 - __main__ - INFO - [5c1d6d2f] Result constructed with 1 documentation pages
+2025-11-09 14:45:17,973 - __main__ - INFO - [5c1d6d2f] Sending to documentation generator: http://204.52.26.255:8080/generate-docs
+2025-11-09 14:45:39,099 - __main__ - INFO - [5c1d6d2f] Documentation generator response status: 400
+2025-11-09 14:45:39,099 - __main__ - ERROR - [5c1d6d2f] Documentation generator returned error: 400 - {"error":"Ollama returned invalid JSON: Expecting ',' delimiter: line 5 column 1750 (char 1812)","status":"error"}
+
+2025-11-09 14:45:39,099 - __main__ - INFO - [5c1d6d2f] Request completed successfully
+2025-11-09 14:45:39,205 - __main__ - INFO - [5c1d6d2f] Cleaned up temporary directory: tmp/e96b8e7a-9273-4556-bec7-c65615386f49
+2025-11-09 14:45:39,205 - werkzeug - INFO - 127.0.0.1 - - [09/Nov/2025 14:45:39] "GET /ingest?repo_url=https://github.com/Last-Minute-Games/game&deep_analysis=true HTTP/1.1" 200 -
+2025-11-09 14:47:07,814 - werkzeug - INFO -  * Detected change in '/home/ubuntu/test2/nvidia-track/backend-jude/main.py', reloading
+2025-11-09 14:47:07,987 - werkzeug - INFO -  * Restarting with stat
+2025-11-09 14:47:09,303 - werkzeug - WARNING -  * Debugger is active!
+2025-11-09 14:47:09,304 - werkzeug - INFO -  * Debugger PIN: 529-206-346
+2025-11-09 14:47:27,646 - __main__ - INFO - [67aec118] New ingest request received
+2025-11-09 14:47:27,875 - __main__ - INFO - [67aec118] Processing repository: github.com/Last-Minute-Games/game
+2025-11-09 14:47:27,875 - __main__ - INFO - [67aec118] Cloning repository to tmp/e5ee98ce-c27d-4915-bf27-bcb3237c654f...
+2025-11-09 14:47:31,248 - __main__ - INFO - [67aec118] Repository cloned successfully
+2025-11-09 14:47:31,248 - __main__ - INFO - [67aec118] Step 1/7: Detecting dependencies...
+2025-11-09 14:47:31,248 - __main__ - INFO - Starting dependency detection for: tmp/e5ee98ce-c27d-4915-bf27-bcb3237c654f
+2025-11-09 14:47:31,265 - __main__ - INFO - Detected languages from file extensions: {'C#'}
+2025-11-09 14:47:31,265 - __main__ - INFO - Detected Unity version: 6000.2.2f1
+2025-11-09 14:47:31,265 - __main__ - INFO - Final dependencies detected: ['Unity 6000.2.2f1', 'C#']
+2025-11-09 14:47:31,265 - __main__ - INFO - [67aec118] Step 2/7: Building project context...
+2025-11-09 14:47:31,266 - __main__ - INFO - Building comprehensive project context for: tmp/e5ee98ce-c27d-4915-bf27-bcb3237c654f
+2025-11-09 14:47:31,266 - __main__ - INFO - Reading all markdown files...
+2025-11-09 14:47:31,284 - __main__ - INFO - Read 1 markdown files, total 52 characters
+2025-11-09 14:47:31,284 - __main__ - INFO - Scanning file structure...
+2025-11-09 14:47:31,294 - __main__ - INFO - Found 353 files in structure
+2025-11-09 14:47:31,294 - __main__ - INFO - Identifying main entry files...
+2025-11-09 14:47:31,338 - __main__ - INFO - Reading sample code from main files...
+2025-11-09 14:47:31,338 - __main__ - INFO - Identifying configuration files...
+2025-11-09 14:47:31,338 - __main__ - INFO - Project context built: 52 chars of docs, 353 files, 0 entry points, 0 config files
+2025-11-09 14:47:31,339 - __main__ - WARNING - [67aec118] README is empty or minimal (52 chars), analyzing entire repo structure...
+2025-11-09 14:47:31,412 - __main__ - INFO - [67aec118] Built intelligent synthetic context from repo analysis: 4395 chars, analyzed 3 code files
+2025-11-09 14:47:31,412 - __main__ - INFO - [67aec118] Step 3/7: Extracting repo name...
+2025-11-09 14:47:31,412 - __main__ - INFO - [67aec118] Repo name: game -> game
+2025-11-09 14:47:31,412 - __main__ - INFO - [67aec118] Step 4/7: Calling LLM for project name and description...
+2025-11-09 14:47:31,412 - __main__ - INFO - LLM call: Extracting project name and description
+2025-11-09 14:47:35,723 - httpx - INFO - HTTP Request: POST http://204.52.27.251:11434/v1/chat/completions "HTTP/1.1 200 OK"
+2025-11-09 14:47:35,736 - __main__ - INFO - LLM response: name='Castle of Time', description='...'
+2025-11-09 14:47:35,736 - __main__ - INFO - [67aec118] Step 5/7: Calling LLM for project goal...
+2025-11-09 14:47:35,736 - __main__ - INFO - LLM call: Extracting project goal/description
+2025-11-09 14:47:41,912 - httpx - INFO - HTTP Request: POST http://204.52.27.251:11434/v1/chat/completions "HTTP/1.1 200 OK"
+2025-11-09 14:47:41,920 - __main__ - INFO - LLM response: goal='A time-manipulation puzzle game built in Unity, where players navigate through increasingly complex ...'
+2025-11-09 14:47:41,920 - __main__ - INFO - [67aec118] Step 6/8: Calling LLM for installation steps...
+2025-11-09 14:47:41,920 - __main__ - INFO - LLM call: Generating installation steps
+2025-11-09 14:47:48,993 - httpx - INFO - HTTP Request: POST http://204.52.27.251:11434/v1/chat/completions "HTTP/1.1 200 OK"
+2025-11-09 14:47:49,000 - __main__ - INFO - LLM generated 5 installation steps
+2025-11-09 14:47:49,000 - __main__ - INFO - [67aec118] Step 7/8: Generating documentation pages...
+2025-11-09 14:47:49,001 - __main__ - INFO - [67aec118] Using standard LLM-based page generation (add ?deep_analysis=true for code analysis)
+2025-11-09 14:47:49,001 - __main__ - INFO - LLM call: Generating documentation page structure
+2025-11-09 14:47:54,960 - httpx - INFO - HTTP Request: POST http://204.52.27.251:11434/v1/chat/completions "HTTP/1.1 200 OK"
+2025-11-09 14:47:54,967 - __main__ - INFO - LLM generated 1 documentation sections
+2025-11-09 14:47:54,968 - __main__ - INFO - Sanitized page titles: ['Documentation Sections for Last-Minute-Games/game']
+2025-11-09 14:47:54,968 - __main__ - WARNING - LLM returned only 1 pages, adding intelligent defaults
+2025-11-09 14:47:54,968 - __main__ - INFO - Added 6 default pages. Total pages: 7
+2025-11-09 14:47:54,968 - __main__ - INFO - Final page titles: ['Introduction', 'Installation', 'Usage Guide', 'Examples', 'Contributing', 'Deployment', 'Documentation Sections for Last-Minute-Games/game']
+2025-11-09 14:47:54,968 - __main__ - INFO - [67aec118] Constructing final result...
+2025-11-09 14:47:54,968 - __main__ - INFO - [67aec118] Result constructed with 7 documentation pages
+2025-11-09 14:47:54,968 - __main__ - INFO - [67aec118] Sending to documentation generator: http://204.52.26.255:8080/generate-docs
+2025-11-09 14:49:50,970 - __main__ - INFO - [67aec118] Documentation generator response status: 200
+2025-11-09 14:49:50,971 - __main__ - INFO - [67aec118] Documentation generated successfully!
+2025-11-09 14:49:50,971 - __main__ - INFO - [67aec118] Request completed successfully
+2025-11-09 14:49:51,061 - __main__ - INFO - [67aec118] Cleaned up temporary directory: tmp/e5ee98ce-c27d-4915-bf27-bcb3237c654f
+2025-11-09 14:49:51,062 - werkzeug - INFO - 127.0.0.1 - - [09/Nov/2025 14:49:51] "GET /ingest?repo_url=https://github.com/Last-Minute-Games/game HTTP/1.1" 200 -

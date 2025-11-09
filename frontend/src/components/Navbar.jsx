@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -32,9 +33,9 @@ const Navbar = () => {
 
           {/* CTA Button */}
           <div className="hidden md:block">
-            <button className="bg-[#76B900] text-white px-8 py-2.5 rounded-lg font-semibold hover:bg-[#5d9100] hover:text-white transition-all transform hover:scale-105 border-2 border-[#76B900] hover:border-[#5d9100]">
+            <Link to="/login" className="border-nvidia text-white px-8 py-2.5 rounded-lg font-semibold hover:bg-nvidia hover:text-white transition-all transform hover:scale-105 border-2 border-[#76B900] hover:border-[#5d9100]">
               Get Started
-            </button>
+            </Link>
           </div>
 
           {/* Mobile menu button */}

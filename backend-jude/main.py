@@ -751,9 +751,27 @@ CRITICAL REQUIREMENTS:
 - You MUST return a valid object with a "pages" field containing a dictionary
 - The dictionary MUST have 7-10 key-value pairs (section name to description)
 - Each section name must be a clear, plain text title (no markdown, no numbering)
-- Each description must be 1-3 sentences about what that section covers
+- Each description MUST be EXTREMELY SPECIFIC and reference ACTUAL files, directories, or code elements you see
 - DO NOT return an empty dictionary
 - DO NOT return null or undefined
+
+DESCRIPTION REQUIREMENTS (READ CAREFULLY):
+- ALWAYS mention specific file names (e.g., "main.py", "frontend/README.md", "schemas/SerializedDoc.py")
+- ALWAYS mention specific directory names (e.g., "backend-jude/", "schemas/", "frontend/")
+- ALWAYS mention specific technologies/frameworks you see in the file structure (e.g., "Flask", "React + Vite", "langchain_openai")
+- ALWAYS mention specific config files (e.g., "package.json", "requirements.txt", "eslint.config.js")
+- Reference actual code features, API endpoints, schema files, or database models you can infer
+- Each description should be 2-4 sentences with CONCRETE details from THIS repository
+
+Example GOOD descriptions (specific to a repo):
+- "High-level introduction to the nvidia-track project, covering its dual nature with both frontend (React + Vite in /frontend) and backend (Python Flask in /backend-jude) components, as evidenced by frontend/README.md and backend-jude/main.py."
+- "In-depth explanation of the backend structure built with Flask and LangChain, highlighting API endpoints in backend-jude/main.py and Pydantic schemas in schemas/ directory (SerializedDoc.py, Dependencies.py, Pages.py)."
+- "Documentation of database schema design including Serialized Documents, Dependencies, Install Processes, and Project Names as defined in backend-jude/schemas/*.py files."
+
+Example BAD descriptions (too generic):
+- "Overview of the project and its features."
+- "Guide to the main features and functionality."
+- "Configuration options and environment setup."
 
 Section ideas based on project type:
 
@@ -766,7 +784,7 @@ For WEB APPS (React/Vue/Next.js/Express):
 For LIBRARIES/TOOLS:
 - Introduction, Installation, Quick Start, Usage Guide, API Reference, Configuration, Advanced Features, Examples, Troubleshooting, Contributing
 
-IMPORTANT: Base sections on what you ACTUALLY see in the code and files. Reference specific files, classes, or technologies when possible.'''),
+REMEMBER: Every description MUST reference specific files or directories from the repository!'''),
             ('human', '{context}')
         ])
         chain = prompt | structured_llm
@@ -1007,7 +1025,7 @@ Generate 4-7 clear, actionable installation steps based on the ACTUAL files and 
 
 REQUIREMENTS:
 - Be SPECIFIC to this project - reference actual files you see (package.json, requirements.txt, etc.)
-- Keep steps concise (one sentence each, max 2 sentences)
+- Keep steps concise 
 - Use actual commands (npm install, pip install -r requirements.txt, etc.)
 - Order: clone → install toolchain → install deps → configure → run
 - DO NOT write paragraphs or use markdown formatting

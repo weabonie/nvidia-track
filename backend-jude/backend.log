@@ -752,3 +752,134 @@ KeyError: 'Input to ChatPromptTemplate is missing variables {\'\\n  "pages"\'}. 
 2025-11-09 15:36:12,500 - werkzeug - INFO -  * Restarting with stat
 2025-11-09 15:36:13,868 - werkzeug - WARNING -  * Debugger is active!
 2025-11-09 15:36:13,869 - werkzeug - INFO -  * Debugger PIN: 529-206-346
+2025-11-09 15:59:46,836 - werkzeug - INFO -  * Detected change in '/home/ubuntu/test2/nvidia-track/backend-jude/main.py', reloading
+2025-11-09 15:59:46,982 - werkzeug - INFO -  * Restarting with stat
+2025-11-09 15:59:48,276 - __main__ - INFO - Created tmp directory
+2025-11-09 15:59:48,283 - werkzeug - WARNING -  * Debugger is active!
+2025-11-09 15:59:48,284 - werkzeug - INFO -  * Debugger PIN: 529-206-346
+2025-11-09 16:00:24,655 - werkzeug - INFO -  * Detected change in '/home/ubuntu/test2/nvidia-track/backend-jude/schemas/Pages.py', reloading
+2025-11-09 16:00:24,796 - werkzeug - INFO -  * Restarting with stat
+2025-11-09 16:00:26,098 - werkzeug - WARNING -  * Debugger is active!
+2025-11-09 16:00:26,099 - werkzeug - INFO -  * Debugger PIN: 529-206-346
+2025-11-09 16:00:35,496 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:3333
+ * Running on http://172.27.26.214:3333
+2025-11-09 16:00:35,496 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-11-09 16:00:35,497 - werkzeug - INFO -  * Restarting with stat
+2025-11-09 16:00:36,809 - werkzeug - WARNING -  * Debugger is active!
+2025-11-09 16:00:36,809 - werkzeug - INFO -  * Debugger PIN: 529-206-346
+2025-11-09 16:00:43,017 - __main__ - INFO - [673a58de] New ingest request received
+2025-11-09 16:00:43,248 - __main__ - INFO - [673a58de] Processing repository: github.com/weabonie/nvidia-track
+2025-11-09 16:00:43,248 - __main__ - INFO - [673a58de] Cloning repository to tmp/31218f46-ea39-4068-a00e-0b9a91f0b71d...
+2025-11-09 16:00:43,395 - __main__ - INFO - [673a58de] Repository cloned successfully
+2025-11-09 16:00:43,395 - __main__ - INFO - [673a58de] Step 1/7: Detecting dependencies...
+2025-11-09 16:00:43,395 - __main__ - INFO - Starting dependency detection for: tmp/31218f46-ea39-4068-a00e-0b9a91f0b71d
+2025-11-09 16:00:43,395 - __main__ - INFO - Detected languages from file extensions: {'JavaScript', 'HTML', 'Python', 'CSS'}
+2025-11-09 16:00:43,396 - __main__ - INFO - Final dependencies detected: ['Python']
+2025-11-09 16:00:43,396 - __main__ - INFO - [673a58de] Step 2/7: Building project context...
+2025-11-09 16:00:43,396 - __main__ - INFO - Building comprehensive project context for: tmp/31218f46-ea39-4068-a00e-0b9a91f0b71d
+2025-11-09 16:00:43,396 - __main__ - INFO - Reading all markdown files...
+2025-11-09 16:00:43,396 - __main__ - INFO - Read 1 markdown files, total 1181 characters
+2025-11-09 16:00:43,396 - __main__ - INFO - Scanning file structure...
+2025-11-09 16:00:43,397 - __main__ - INFO - Found 45 files in structure
+2025-11-09 16:00:43,397 - __main__ - INFO - Identifying main entry files...
+2025-11-09 16:00:43,398 - __main__ - INFO - Found entry file: frontend/index.html
+2025-11-09 16:00:43,398 - __main__ - INFO - Found entry file: backend-jude/main.py
+2025-11-09 16:00:43,399 - __main__ - INFO - Found entry file: backend/publish/app.py
+2025-11-09 16:00:43,400 - __main__ - INFO - Reading sample code from main files...
+2025-11-09 16:00:43,400 - __main__ - INFO - Read code sample from frontend/index.html: 361 chars
+2025-11-09 16:00:43,400 - __main__ - INFO - Read code sample from backend-jude/main.py: 2000 chars
+2025-11-09 16:00:43,400 - __main__ - INFO - Read code sample from backend/publish/app.py: 2000 chars
+2025-11-09 16:00:43,400 - __main__ - INFO - Identifying configuration files...
+2025-11-09 16:00:43,400 - __main__ - INFO - Project context built: 1181 chars of docs, 45 files, 3 entry points, 0 config files
+2025-11-09 16:00:43,400 - __main__ - INFO - [673a58de] Step 3/7: Extracting repo name...
+2025-11-09 16:00:43,400 - __main__ - INFO - [673a58de] Repo name: nvidia-track -> nvidia-track
+2025-11-09 16:00:43,400 - __main__ - INFO - [673a58de] Step 4/7: Calling LLM for project name and description...
+2025-11-09 16:00:43,400 - __main__ - INFO - LLM call: Extracting project name and description
+2025-11-09 16:00:55,966 - httpx - INFO - HTTP Request: POST http://204.52.27.251:11434/v1/chat/completions "HTTP/1.1 200 OK"
+2025-11-09 16:00:55,980 - __main__ - INFO - LLM response: name='Vite React Starter', description='A minimal web development template providing a streamlined setup for building React applications wit...'
+2025-11-09 16:00:55,980 - __main__ - INFO - [673a58de] Step 5/7: Calling LLM for project goal...
+2025-11-09 16:00:55,980 - __main__ - INFO - LLM call: Extracting project goal/description
+2025-11-09 16:01:00,692 - httpx - INFO - HTTP Request: POST http://204.52.27.251:11434/v1/chat/completions "HTTP/1.1 200 OK"
+2025-11-09 16:01:00,699 - __main__ - INFO - LLM response: goal='A lightweight React development template powered by Vite, featuring Hot Module Replacement (HMR) and...'
+2025-11-09 16:01:00,700 - __main__ - INFO - [673a58de] Step 6/8: Calling LLM for installation steps...
+2025-11-09 16:01:00,700 - __main__ - INFO - LLM call: Generating installation steps
+2025-11-09 16:01:08,850 - httpx - INFO - HTTP Request: POST http://204.52.27.251:11434/v1/chat/completions "HTTP/1.1 200 OK"
+2025-11-09 16:01:08,858 - __main__ - INFO - LLM generated 7 installation steps
+2025-11-09 16:01:08,858 - __main__ - INFO - [673a58de] Step 7/8: Generating documentation pages...
+2025-11-09 16:01:08,858 - __main__ - INFO - [673a58de] Using standard LLM-based page generation (add ?deep_analysis=true for code analysis)
+2025-11-09 16:01:08,858 - __main__ - INFO - LLM call: Generating documentation page structure
+2025-11-09 16:01:08,858 - __main__ - INFO - Asking LLM to generate pages with 1181 chars of readme, 45 files, 1 dependencies
+2025-11-09 16:01:30,094 - httpx - INFO - HTTP Request: POST http://204.52.27.251:11434/v1/chat/completions "HTTP/1.1 200 OK"
+2025-11-09 16:01:30,106 - __main__ - INFO - LLM response type: <class 'schemas.Pages.Pages'>
+2025-11-09 16:01:30,106 - __main__ - INFO - LLM response: pages={'Project Overview': 'High-level introduction to the nvidia-track project, covering its dual nature with both frontend (React + Vite) and backend (Python, Flask) components, as referenced in the README.md and file structure.', 'Frontend Setup with React and Vite': 'Detailed guide on setting up the frontend environment using the provided template, including enabling/disabling the React Compiler and expanding ESLint configuration, as mentioned in frontend/README.md.', 'Backend Architecture (Python & Flask)': 'In-depth explanation of the backend structure, highlighting the use of Python, Flask, and various dependencies (e.g., langchain_openai, chromadb) in files like backend-jude/main.py and requirements.txt.', 'API Endpoints and Request Handling': 'Documentation of API endpoints, request/response formats, and error handling mechanisms within the backend, derived from analysis of backend-jude/main.py and related schema files (e.g., schemas/SerializedDoc.py).', 'Database Schemas and Models': 'Description of database schema design, including tables for Serialized Documents, Dependencies, Install Processes, Pages, and Project Names, as defined in backend-jude/schemas/*.py.', 'Deployment Considerations (Docker & Environment Variables)': 'Guidance on deploying the application using Docker (as hinted at by .dockerignore and Dockerfile files) and managing environment variables (e.g., .env.example).', 'Troubleshooting Common Issues': "Troubleshooting section focusing on potential pitfalls in both frontend (e.g., Vite, React Compiler issues) and backend (e.g., Flask, dependency conflicts) environments, informed by the project's configuration and codebase.", 'Contributing to the Project': 'Step-by-step instructions for new contributors, covering setup, coding standards (inferred from eslint.config.js), and the process for submitting changes, with references to relevant files like package.json and backend-jude/requirements.txt.'}
+2025-11-09 16:01:30,106 - __main__ - INFO - LLM generated 8 documentation sections
+2025-11-09 16:01:30,106 - __main__ - INFO - Sanitized page titles (8 valid pages): ['Project Overview', 'Frontend Setup with React and Vite', 'Backend Architecture (Python & Flask)', 'API Endpoints and Request Handling', 'Database Schemas and Models', 'Deployment Considerations (Docker & Environment Variables)', 'Troubleshooting Common Issues', 'Contributing to the Project']
+2025-11-09 16:01:30,106 - __main__ - INFO - [673a58de] Constructing final result...
+2025-11-09 16:01:30,106 - __main__ - INFO - [673a58de] Result constructed with 8 documentation pages
+2025-11-09 16:01:30,106 - __main__ - INFO - [673a58de] Sending to documentation generator: http://204.52.26.255:8080/generate-docs
+2025-11-09 16:04:03,980 - __main__ - INFO - [673a58de] Documentation generator response status: 200
+2025-11-09 16:04:03,980 - __main__ - INFO - [673a58de] Documentation generated successfully!
+2025-11-09 16:04:03,980 - __main__ - INFO - [673a58de] Request completed successfully
+2025-11-09 16:04:03,983 - __main__ - INFO - [673a58de] Cleaned up temporary directory: tmp/31218f46-ea39-4068-a00e-0b9a91f0b71d
+2025-11-09 16:04:03,983 - werkzeug - INFO - 127.0.0.1 - - [09/Nov/2025 16:04:03] "GET /ingest?repo_url=https://github.com/weabonie/nvidia-track HTTP/1.1" 200 -
+2025-11-09 16:04:31,559 - werkzeug - INFO -  * Detected change in '/home/ubuntu/test2/nvidia-track/backend-jude/main.py', reloading
+2025-11-09 16:04:31,743 - werkzeug - INFO -  * Restarting with stat
+2025-11-09 16:04:33,124 - werkzeug - WARNING -  * Debugger is active!
+2025-11-09 16:04:33,124 - werkzeug - INFO -  * Debugger PIN: 529-206-346
+2025-11-09 16:05:19,637 - werkzeug - INFO -  * Detected change in '/home/ubuntu/test2/nvidia-track/backend-jude/main.py', reloading
+2025-11-09 16:05:19,827 - werkzeug - INFO -  * Restarting with stat
+2025-11-09 16:05:21,200 - werkzeug - WARNING -  * Debugger is active!
+2025-11-09 16:05:21,201 - werkzeug - INFO -  * Debugger PIN: 529-206-346
+2025-11-09 16:10:10,153 - __main__ - INFO - [34df0ab9] New ingest request received
+2025-11-09 16:10:10,386 - __main__ - INFO - [34df0ab9] Processing repository: github.com/anshlovescoffee/ripplehackutd
+2025-11-09 16:10:10,387 - __main__ - INFO - [34df0ab9] Cloning repository to tmp/f41f78e1-9827-4aa1-8817-415517a38843...
+2025-11-09 16:10:10,640 - __main__ - INFO - [34df0ab9] Repository cloned successfully
+2025-11-09 16:10:10,641 - __main__ - INFO - [34df0ab9] Step 1/7: Detecting dependencies...
+2025-11-09 16:10:10,641 - __main__ - INFO - Starting dependency detection for: tmp/f41f78e1-9827-4aa1-8817-415517a38843
+2025-11-09 16:10:10,641 - __main__ - INFO - Detected languages from file extensions: {'JavaScript', 'CSS', 'HTML'}
+2025-11-09 16:10:10,641 - __main__ - INFO - Final dependencies detected: ['CSS', 'HTML', 'JavaScript']
+2025-11-09 16:10:10,641 - __main__ - INFO - [34df0ab9] Step 2/7: Building project context...
+2025-11-09 16:10:10,641 - __main__ - INFO - Building comprehensive project context for: tmp/f41f78e1-9827-4aa1-8817-415517a38843
+2025-11-09 16:10:10,641 - __main__ - INFO - Reading all markdown files...
+2025-11-09 16:10:10,642 - __main__ - INFO - Read 2 markdown files, total 1947 characters
+2025-11-09 16:10:10,642 - __main__ - INFO - Scanning file structure...
+2025-11-09 16:10:10,642 - __main__ - INFO - Found 14 files in structure
+2025-11-09 16:10:10,642 - __main__ - INFO - Identifying main entry files...
+2025-11-09 16:10:10,642 - __main__ - INFO - Found entry file: hackutd-frontend/index.html
+2025-11-09 16:10:10,643 - __main__ - INFO - Reading sample code from main files...
+2025-11-09 16:10:10,643 - __main__ - INFO - Read code sample from hackutd-frontend/index.html: 361 chars
+2025-11-09 16:10:10,643 - __main__ - INFO - Identifying configuration files...
+2025-11-09 16:10:10,643 - __main__ - INFO - Project context built: 1947 chars of docs, 14 files, 1 entry points, 0 config files
+2025-11-09 16:10:10,643 - __main__ - INFO - [34df0ab9] Step 3/7: Extracting repo name...
+2025-11-09 16:10:10,644 - __main__ - INFO - [34df0ab9] Repo name: ripplehackutd -> ripplehackutd
+2025-11-09 16:10:10,644 - __main__ - INFO - [34df0ab9] Step 4/7: Calling LLM for project name and description...
+2025-11-09 16:10:10,644 - __main__ - INFO - LLM call: Extracting project name and description
+2025-11-09 16:10:20,852 - httpx - INFO - HTTP Request: POST http://204.52.27.251:11434/v1/chat/completions "HTTP/1.1 200 OK"
+2025-11-09 16:10:20,866 - __main__ - INFO - LLM response: name='RippleHackUTD', description='...'
+2025-11-09 16:10:20,866 - __main__ - INFO - [34df0ab9] Step 5/7: Calling LLM for project goal...
+2025-11-09 16:10:20,866 - __main__ - INFO - LLM call: Extracting project goal/description
+2025-11-09 16:10:29,037 - httpx - INFO - HTTP Request: POST http://204.52.27.251:11434/v1/chat/completions "HTTP/1.1 200 OK"
+2025-11-09 16:10:29,045 - __main__ - INFO - LLM response: goal='A dual-template repository containing two distinct web development project setups: **Next.js Project...'
+2025-11-09 16:10:29,045 - __main__ - INFO - [34df0ab9] Step 6/8: Calling LLM for installation steps...
+2025-11-09 16:10:29,045 - __main__ - INFO - LLM call: Generating installation steps
+2025-11-09 16:10:38,782 - httpx - INFO - HTTP Request: POST http://204.52.27.251:11434/v1/chat/completions "HTTP/1.1 200 OK"
+2025-11-09 16:10:38,790 - __main__ - INFO - LLM generated 6 installation steps
+2025-11-09 16:10:38,790 - __main__ - INFO - [34df0ab9] Step 7/8: Generating documentation pages...
+2025-11-09 16:10:38,790 - __main__ - INFO - [34df0ab9] Using standard LLM-based page generation (add ?deep_analysis=true for code analysis)
+2025-11-09 16:10:38,790 - __main__ - INFO - LLM call: Generating documentation page structure
+2025-11-09 16:10:38,790 - __main__ - INFO - Asking LLM to generate pages with 1947 chars of readme, 14 files, 3 dependencies
+2025-11-09 16:11:06,895 - httpx - INFO - HTTP Request: POST http://204.52.27.251:11434/v1/chat/completions "HTTP/1.1 200 OK"
+2025-11-09 16:11:06,903 - __main__ - INFO - LLM response type: <class 'schemas.Pages.Pages'>
+2025-11-09 16:11:06,903 - __main__ - INFO - LLM response: pages={'Project Overview and Bootstrapping': "High-level introduction to the project, highlighting its bootstrapping with `create-next-app` for Next.js, as mentioned in the main `README.md`. This section will cover the initial setup and dependencies installed during the bootstrapping process, referencing the project's root `README.md` file.", 'Getting Started with Development Server': 'Step-by-step guide to launching the development server using commands (`npm run dev`, `yarn dev`, `pnpm dev`, or `bun dev`) as outlined in the main `README.md`. This section will also touch upon the auto-update feature when editing files, specifically mentioning `app/page.js`.', 'Font Optimization with Next.js': 'In-depth explanation of how this project utilizes `next/font` for automatic font optimization, focusing on the integration of the Geist font family from Vercel, as detailed in the main `README.md` and potentially referencing `nextjs.org/docs/app/building-your-application/optimizing/fonts`.', 'React + Vite Setup in hackutd-frontend': 'Detailed analysis of the minimal React setup within the `hackutd-frontend` directory, utilizing Vite with Hot Module Replacement (HMR) and ESLint rules, as described in `hackutd-frontend/README.md`. This section will explore the role of official plugins like `@vitejs/plugin-react` and `@vitejs/plugin-react-swc`.', 'Vite Configuration for React': 'Examination of the Vite configuration file (`vite.config.js`) within `hackutd-frontend`, discussing how it enables React to work seamlessly with Vite, potentially referencing `https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md` for deeper insights.', 'ESLint Configuration for Code Quality': 'Overview of the ESLint configuration (`eslint.config.js`) in the `hackutd-frontend` directory, highlighting the rules and settings in place to maintain code quality and best practices within the React + Vite setup.', 'Deployment Options with Vercel': 'Guidance on deploying the Next.js application using the Vercel Platform, as suggested in the main `README.md`, including a brief overview of the deployment documentation at `https://nextjs.org/docs/app/building-your-application/deploying`.', 'Entry Points and Application Structure': 'Analysis of the main entry files, such as `hackutd-frontend/index.html`, and how they relate to the overall application structure, including the role of `src/main.jsx` in initializing the React app.'}
+2025-11-09 16:11:06,903 - __main__ - INFO - LLM generated 8 documentation sections
+2025-11-09 16:11:06,903 - __main__ - INFO - Sanitized page titles (8 valid pages): ['Project Overview and Bootstrapping', 'Getting Started with Development Server', 'Font Optimization with Next.js', 'React + Vite Setup in hackutd-frontend', 'Vite Configuration for React', 'ESLint Configuration for Code Quality', 'Deployment Options with Vercel', 'Entry Points and Application Structure']
+2025-11-09 16:11:06,903 - __main__ - INFO - [34df0ab9] Constructing final result...
+2025-11-09 16:11:06,903 - __main__ - INFO - [34df0ab9] Result constructed with 8 documentation pages
+2025-11-09 16:11:06,903 - __main__ - INFO - [34df0ab9] Sending to documentation generator: http://204.52.26.255:8080/generate-docs
+2025-11-09 16:13:32,750 - __main__ - INFO - [34df0ab9] Documentation generator response status: 200
+2025-11-09 16:13:32,750 - __main__ - INFO - [34df0ab9] Documentation generated successfully!
+2025-11-09 16:13:32,750 - __main__ - INFO - [34df0ab9] Request completed successfully
+2025-11-09 16:13:32,751 - __main__ - INFO - [34df0ab9] Cleaned up temporary directory: tmp/f41f78e1-9827-4aa1-8817-415517a38843
+2025-11-09 16:13:32,752 - werkzeug - INFO - 127.0.0.1 - - [09/Nov/2025 16:13:32] "GET /ingest?repo_url=https://github.com/anshlovescoffee/ripplehackutd HTTP/1.1" 200 -

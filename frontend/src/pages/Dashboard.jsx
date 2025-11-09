@@ -37,15 +37,33 @@ const Dashboard = () => {
     const fetchProjects = async () => {
       try {
         const response = await axios.get("https://apihackutd.siru.dev/repos");
-        const formattedProjects = response.data.map((project) => ({
-          id: project.id,
-          name: project.name,
-          description: project.description || "No description provided",
-          updatedAt: "Recently updated",
-          tech: project.languages || [],
-          visibility: project.private ? "private" : "public",
-          link: project.html_url,
-        }));
+        const data = response.data;
+        // API returns an array of repo names, e.g., ["uhevents", "web", "hackutd-2025-proj"]
+        const formattedProjects = Array.isArray(data)
+          ? data.map((item) => {
+              if (typeof item === "string") {
+                return {
+                  id: item,
+                  name: item,
+                  description: "",
+                  updatedAt: "Recently updated",
+                  tech: [],
+                  visibility: "public",
+                  link: "#",
+                };
+              }
+              // Fallback if the API returns objects in the future
+              return {
+                id: item.id ?? item.name ?? crypto.randomUUID?.() ?? String(Math.random()),
+                name: item.name ?? "Untitled",
+                description: item.description || "",
+                updatedAt: "Recently updated",
+                tech: item.languages || [],
+                visibility: item.private ? "private" : "public",
+                link: item.html_url || "#",
+              };
+            })
+          : [];
         setProjects(formattedProjects);
         setIsLoading(false);
       } catch (err) {
@@ -118,7 +136,7 @@ const Dashboard = () => {
             // Show actual project cards after loading
             projects.map((p, index) => (
               <div
-                key={p}
+                key={p.id || p.name || index}
                 className="animate-scale-in opacity-0"
                 style={{ animationDelay: `${0.1 + index * 0.05}s` }}
               >

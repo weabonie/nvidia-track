@@ -118,7 +118,7 @@ const Dashboard = () => {
             // Show actual project cards after loading
             projects.map((p, index) => (
               <div
-                key={p.id}
+                key={p}
                 className="animate-scale-in opacity-0"
                 style={{ animationDelay: `${0.1 + index * 0.05}s` }}
               >

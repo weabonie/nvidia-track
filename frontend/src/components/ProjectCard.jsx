@@ -13,15 +13,15 @@ import {
 
 import { Button } from "./ui/button"
 
-const ProjectCard = ({ project = {} }) => {
-  const {
-    name = "Untitled Project",
-    description = "No description provided",
-    updatedAt = "—",
-    link = "#",
-    tech = [],
-    visibility = "private",
-  } = project
+const ProjectCard = ({ projectName }) => {
+  const project = {
+    name: projectName,
+    description: "No description provided",
+    updatedAt: "—",
+    link: "#",
+    tech: [],
+    visibility: "private",
+  }
 
   const navigate = useNavigate()
 

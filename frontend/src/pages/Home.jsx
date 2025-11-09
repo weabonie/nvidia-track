@@ -7,21 +7,10 @@ const Home = () => {
         <div className="absolute inset-0">
           {/* Dark gradient base */}
           <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-black to-gray-900"></div>
-          
-          {/* NVIDIA green accent lines */}
-          <div className="absolute top-0 left-0 w-full h-full opacity-20">
-            <div className="absolute top-1/4 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#76B900] to-transparent"></div>
-            <div className="absolute top-1/2 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#76B900] to-transparent"></div>
-            <div className="absolute top-3/4 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#76B900] to-transparent"></div>
-          </div>
-          
+
           {/* Animated green glow effects */}
           <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-[#76B900] rounded-full blur-[120px] opacity-10 animate-pulse"></div>
           <div className="absolute bottom-1/4 left-1/4 w-96 h-96 bg-[#76B900] rounded-full blur-[120px] opacity-10 animate-pulse" style={{ animationDelay: "1s" }}></div>
-          
-          {/* Geometric shapes */}
-          <div className="absolute top-10 right-10 w-32 h-32 border border-[#76B900] opacity-20 rotate-45"></div>
-          <div className="absolute bottom-10 left-10 w-24 h-24 border border-[#76B900] opacity-20 rotate-12"></div>
         </div>
         
         <div className="relative max-w-4xl mx-auto text-center px-4 z-10">

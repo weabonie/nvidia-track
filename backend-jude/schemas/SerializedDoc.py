@@ -4,8 +4,13 @@ from pydantic import BaseModel, Field, field_serializer
 from langchain_core.documents import Document
 
 class SerializedDoc(BaseModel):
-    dependencies: List[str] = Field(description='List of dependencies needed to run the project. This should not include the project name itself. For instance, some examples include Node, Python, TypeScript or React. Look at the files itself based on the language to determine dependencies.')
-    goal: str = Field(description='Why this project was made. The end goal of this software. For instance, a web browser might want to help users navigate the web easier.')
-    pages: Dict[str, str] = Field(description='Names of each page mapped to what the summary of each page would be, each summary should be a paragraph. Subsections of the project to write about')
-    repo_name: str = Field(description='Name of the project itself.')
-    install_process: str = Field(description='A paragraph on the process of installing the project')
+    repo_name: str = Field(description='The repository slug/identifier (lowercase, kebab-case, no .git extension)', alias='repo-name')
+    name: str = Field(description='Human-readable project name (title case, proper formatting)')
+    description: str = Field(description='A concise one-sentence description of what the project does')
+    goal: str = Field(description='The end goal or purpose of this software - what problem it solves or what value it provides')
+    dependencies: List[str] = Field(description='List of key dependencies, frameworks, and technologies with versions where applicable (e.g., "Next.js 14", "FastAPI", "PostgreSQL")')
+    installation: List[str] = Field(description='Step-by-step installation instructions as an array of clear, actionable steps')
+    pages: Dict[str, str] = Field(description='Documentation sections mapped to their descriptions. Each section should have a clear purpose (e.g., "Introduction", "Quick Start", "API Reference", "Configuration", "Troubleshooting")')
+    
+    class Config:
+        populate_by_name = True

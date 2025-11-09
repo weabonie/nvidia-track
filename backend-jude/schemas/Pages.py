@@ -15,5 +15,5 @@ class Pages(BaseModel):
         - "Usage Examples": Example use cases and walkthroughs
         - "Troubleshooting": Common issues and solutions
         - "Architecture": System design and technical overview if it's a complex project
-        Each description should be 1-2 sentences explaining what that section covers."""
+        Each section should have a clear purpose and provide value to the user."""
     )

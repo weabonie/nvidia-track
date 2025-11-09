@@ -1,0 +1,2 @@
+FROM nemotron:70b
+PARAMETER num_ctx 128000

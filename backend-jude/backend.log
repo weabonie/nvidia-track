@@ -581,3 +581,20 @@ fatal: unable to access 'https://https://github.com/Last-Minute-Games/game/': Co
 2025-11-09 14:49:50,971 - __main__ - INFO - [67aec118] Request completed successfully
 2025-11-09 14:49:51,061 - __main__ - INFO - [67aec118] Cleaned up temporary directory: tmp/e5ee98ce-c27d-4915-bf27-bcb3237c654f
 2025-11-09 14:49:51,062 - werkzeug - INFO - 127.0.0.1 - - [09/Nov/2025 14:49:51] "GET /ingest?repo_url=https://github.com/Last-Minute-Games/game HTTP/1.1" 200 -
+2025-11-09 14:55:02,733 - werkzeug - INFO -  * Detected change in '/home/ubuntu/test2/nvidia-track/backend-jude/main.py', reloading
+2025-11-09 14:55:02,910 - werkzeug - INFO -  * Restarting with stat
+2025-11-09 14:55:04,207 - __main__ - INFO - Created tmp directory
+2025-11-09 14:55:04,214 - werkzeug - WARNING -  * Debugger is active!
+2025-11-09 14:55:04,214 - werkzeug - INFO -  * Debugger PIN: 529-206-346
+2025-11-09 15:17:26,375 - werkzeug - INFO -  * Detected change in '/home/ubuntu/test2/nvidia-track/backend-jude/main.py', reloading
+2025-11-09 15:17:26,518 - werkzeug - INFO -  * Restarting with stat
+2025-11-09 15:17:27,837 - werkzeug - WARNING -  * Debugger is active!
+2025-11-09 15:17:27,837 - werkzeug - INFO -  * Debugger PIN: 529-206-346
+2025-11-09 15:17:41,992 - werkzeug - INFO -  * Detected change in '/home/ubuntu/test2/nvidia-track/backend-jude/main.py', reloading
+2025-11-09 15:17:42,142 - werkzeug - INFO -  * Restarting with stat
+2025-11-09 15:17:43,460 - werkzeug - WARNING -  * Debugger is active!
+2025-11-09 15:17:43,461 - werkzeug - INFO -  * Debugger PIN: 529-206-346
+2025-11-09 15:18:00,644 - werkzeug - INFO -  * Detected change in '/home/ubuntu/test2/nvidia-track/backend-jude/main.py', reloading
+2025-11-09 15:18:00,784 - werkzeug - INFO -  * Restarting with stat
+2025-11-09 15:18:02,091 - werkzeug - WARNING -  * Debugger is active!
+2025-11-09 15:18:02,091 - werkzeug - INFO -  * Debugger PIN: 529-206-346

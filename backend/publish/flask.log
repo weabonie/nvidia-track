@@ -1,0 +1,16 @@
+nohup: ignoring input
+2025-11-09 05:13:14 [INFO] Loaded .env file
+2025-11-09 05:13:14 [INFO] Config loaded:
+2025-11-09 05:13:14 [INFO]   OLLAMA_MODEL: nemotron:latest
+2025-11-09 05:13:14 [INFO]   OLLAMA_URL: http://localhost:11434/api/chat
+2025-11-09 05:13:14 [INFO]   SITES_ROOT: /home/ubuntu/nvidia-track/backend/publish/generated_sites
+2025-11-09 05:13:14 [INFO]   BASE_DOMAIN: siru.dev
+2025-11-09 05:13:14 [INFO]   NPM_ENABLED: True
+2025-11-09 05:13:14 [INFO]   DOCS_SERVER_IP: 100.74.32.124
+ * Serving Flask app 'app'
+ * Debug mode: off
+2025-11-09 05:13:14 [INFO] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://172.27.26.214:8080
+2025-11-09 05:13:14 [INFO] [33mPress CTRL+C to quit[0m

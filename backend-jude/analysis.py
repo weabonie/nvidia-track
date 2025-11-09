@@ -269,9 +269,75 @@ def enrich_graph(graph_data, llm):
             
     return graph_data
 
+def generate_pages_from_graph(enriched_graph):
+    """
+    Generate a pages dictionary from the enriched graph.
+    Groups functions by file and creates comprehensive summaries.
+    """
+    pages = {}
+    
+    # Group functions by file
+    file_functions = {}
+    for func_key, func_info in enriched_graph.get("functions", {}).items():
+        file_path = func_info.get("file_path", "unknown")
+        if file_path not in file_functions:
+            file_functions[file_path] = []
+        file_functions[file_path].append((func_key, func_info))
+    
+    # Generate page summaries for each file
+    for file_path, functions in file_functions.items():
+        # Create a readable page title from file path
+        page_title = file_path.replace('/', ' > ').replace('.py', '').replace('.js', '').replace('.java', '')
+        
+        # Build comprehensive summary for this file
+        summary_parts = []
+        summary_parts.append(f"This file contains {len(functions)} function(s):")
+        
+        for func_key, func_info in functions:
+            func_name = func_info.get("function_name", "unknown")
+            summary = func_info.get("summary", {})
+            
+            if summary:
+                purpose = summary.get("purpose", "No description available")
+                inputs = summary.get("inputs", [])
+                outputs = summary.get("outputs", "No return value")
+                dependencies = summary.get("dependencies", [])
+                
+                func_summary = f"\n\n**{func_name}**: {purpose}"
+                
+                if inputs:
+                    input_desc = ", ".join([f"{inp.get('name', 'param')} ({inp.get('description', 'no desc')})" for inp in inputs])
+                    func_summary += f" Takes inputs: {input_desc}."
+                
+                func_summary += f" Returns: {outputs}."
+                
+                if dependencies:
+                    func_summary += f" Uses: {', '.join(dependencies)}."
+                
+                summary_parts.append(func_summary)
+            else:
+                summary_parts.append(f"\n\n**{func_name}**: Function analysis pending or failed.")
+        
+        pages[page_title] = " ".join(summary_parts)
+    
+    # Add a high-level overview page
+    total_functions = len(enriched_graph.get("functions", {}))
+    total_files = len(file_functions)
+    overview = f"This project contains {total_files} file(s) with a total of {total_functions} function(s). "
+    overview += f"The codebase has been analyzed to understand the purpose, inputs, outputs, and dependencies of each function. "
+    overview += f"The analysis covers the complete project structure and provides detailed insights into each component."
+    
+    pages["Project Overview"] = overview
+    
+    return pages
+
 # --- Orchestrator Function ---
 
 def analyze_repo(repo_url, llm):
+    """
+    Analyzes a repository and returns a dictionary with enriched graph and generated pages.
+    Returns a dict with keys: 'graph' (the enriched graph) and 'pages' (the generated pages dict)
+    """
     folder_name = uuid.uuid4()
     clone_dir = f'tmp/{folder_name}'
     
@@ -285,8 +351,14 @@ def analyze_repo(repo_url, llm):
         print("\nEnriching graph with LLM summaries...")
         enriched_graph = enrich_graph(skeleton_graph, llm)
         
+        print("\nGenerating pages from enriched graph...")
+        pages = generate_pages_from_graph(enriched_graph)
+        
         print("\nAnalysis complete.")
-        return enriched_graph
+        return {
+            'graph': enriched_graph,
+            'pages': pages
+        }
 
     except Exception as e:
         print(f"An error occurred during analysis: {e}")

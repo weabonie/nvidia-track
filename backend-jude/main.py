@@ -140,22 +140,28 @@ def ingest():
         # 3. Get repo name
         repo_name = repo_url.split('/')[-1]
 
-        # 4. Get pages (placeholder)
-        pages = {"summary": "This is an auto-generated summary."}
+        # 4. Generate comprehensive pages from graph analysis
+        # This performs deep code analysis using the integrated 1_build_skeleton and 2_enrich_graph logic
+        pages = {"summary": "This is an auto-generated summary."}  # Default fallback
+        try:
+            full_repo_url = f"https://{repo_url}"
+            print("\n=== Starting deep code analysis ===")
+            analysis_result = analysis.analyze_repo(full_repo_url, llm)
+            
+            # Extract pages from analysis result
+            if analysis_result and 'pages' in analysis_result:
+                pages = analysis_result['pages']
+                print(f"✓ Successfully generated {len(pages)} pages from code analysis")
+            else:
+                print("⚠ Analysis returned but no pages found, using default")
+        except Exception as e:
+            print(f"⚠ Graph analysis failed: {e}")
+            print("  Continuing with basic analysis only...")
 
+        # 5. Generate installation process
         install_process = get_install_process(str(dependencies), llm)
 
-        # The call to the deeper analysis function is preserved but its output is not
-        # currently used in the final SerializedDoc. This can be integrated later.
-        # try:
-        #     full_repo_url = f"https://{repo_url}"
-        #     graph = analysis.analyze_repo(full_repo_url, llm)
-        #     print("Graph analysis successful.")
-        # except Exception as e:
-        #     print(f"Graph analysis failed: {e}")
-
-
-        # 5. Construct the result
+        # 6. Construct the result
         result = SerializedDoc(
             dependencies=dependencies,
             goal=goal,

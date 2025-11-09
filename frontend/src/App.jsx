@@ -12,6 +12,7 @@ import LoginPage from './pages/LoginPage'
 import Dashboard from "./pages/Dashboard";
 import ProjectLayout from "./components/ProjectsLayout";
 import ProjectDetails from "./pages/ProjectDetails";
+import ProjectOverview from "./pages/ProjectOverview";
 
 // import Login from './pages/auth/Login';
 // import Register from './pages/auth/Register';
@@ -52,7 +53,7 @@ const router = createBrowserRouter([
       },
       {
         path: ":id",
-        element: <ProjectDetails />,
+        element: <ProjectOverview />,
       },
       // {
       //   path: 'about',

@@ -8,6 +8,8 @@ import {
 
 import Home from "./pages/Home";
 import Layout from './Layout'
+import LoginPage from './pages/LoginPage'
+
 // import Login from './pages/auth/Login';
 // import Register from './pages/auth/Register';
 // import Header from './components/nav/Header';
@@ -32,10 +34,10 @@ const router = createBrowserRouter([
     ],
   },
   // You can add other top-level routes without the main layout here if needed
-  // {
-  //   path: '/login',
-  //   element: <LoginPage />,
-  // },
+  {
+    path: '/login',
+    element: <LoginPage />,
+  },
 ]);
 
 function App({ routes }) {

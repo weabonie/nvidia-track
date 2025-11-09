@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -9,32 +10,32 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
           <div className="flex-shrink-0">
-            <a href="/" className="text-2xl font-bold tracking-tight hover:text-gray-300 transition-colors">
+            <a href="/" className="text-2xl font-bold tracking-tight text-[#76B900] hover:text-[#5d9100] transition-colors">
               NVIDIA Track
             </a>
           </div>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex space-x-10">
-            <a href="#home" className="text-sm font-medium hover:text-gray-300 transition-colors uppercase tracking-wide">
+            <a href="#home" className="text-sm font-medium hover:text-[#76B900] transition-colors uppercase tracking-wide">
               Home
             </a>
-            <a href="#features" className="text-sm font-medium hover:text-gray-300 transition-colors uppercase tracking-wide">
+            <a href="#features" className="text-sm font-medium hover:text-[#76B900] transition-colors uppercase tracking-wide">
               Features
             </a>
-            <a href="#about" className="text-sm font-medium hover:text-gray-300 transition-colors uppercase tracking-wide">
+            <a href="#about" className="text-sm font-medium hover:text-[#76B900] transition-colors uppercase tracking-wide">
               About
             </a>
-            <a href="#contact" className="text-sm font-medium hover:text-gray-300 transition-colors uppercase tracking-wide">
+            <a href="#contact" className="text-sm font-medium hover:text-[#76B900] transition-colors uppercase tracking-wide">
               Contact
             </a>
           </div>
 
           {/* CTA Button */}
           <div className="hidden md:block">
-            <button className="bg-white text-black px-8 py-2.5 rounded-lg font-semibold hover:bg-gray-200 transition-all transform hover:scale-105">
+            <Link to="/login" className="border-nvidia text-white px-8 py-2.5 rounded-lg font-semibold hover:bg-nvidia hover:text-white transition-all transform hover:scale-105 border-2 border-[#76B900] hover:border-[#5d9100]">
               Get Started
-            </button>
+            </Link>
           </div>
 
           {/* Mobile menu button */}
@@ -66,19 +67,19 @@ const Navbar = () => {
         {isMenuOpen && (
           <div className="md:hidden pb-6 pt-2 border-t border-gray-800">
             <div className="flex flex-col space-y-4">
-              <a href="#home" className="text-sm font-medium hover:text-gray-300 transition-colors uppercase tracking-wide">
+              <a href="#home" className="text-sm font-medium hover:text-[#76B900] transition-colors uppercase tracking-wide">
                 Home
               </a>
-              <a href="#features" className="text-sm font-medium hover:text-gray-300 transition-colors uppercase tracking-wide">
+              <a href="#features" className="text-sm font-medium hover:text-[#76B900] transition-colors uppercase tracking-wide">
                 Features
               </a>
-              <a href="#about" className="text-sm font-medium hover:text-gray-300 transition-colors uppercase tracking-wide">
+              <a href="#about" className="text-sm font-medium hover:text-[#76B900] transition-colors uppercase tracking-wide">
                 About
               </a>
-              <a href="#contact" className="text-sm font-medium hover:text-gray-300 transition-colors uppercase tracking-wide">
+              <a href="#contact" className="text-sm font-medium hover:text-[#76B900] transition-colors uppercase tracking-wide">
                 Contact
               </a>
-              <button className="bg-white text-black px-6 py-2.5 rounded-lg font-semibold hover:bg-gray-200 transition-all w-full mt-2">
+              <button className="bg-[#76B900] text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-[#5d9100] hover:text-white transition-all w-full mt-2 border-2 border-[#76B900] hover:border-[#5d9100]">
                 Get Started
               </button>
             </div>

@@ -13,6 +13,7 @@ import {
 
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Link } from "react-router-dom";
 
 const LoginForm = () => {
   return (
@@ -55,9 +56,9 @@ const LoginForm = () => {
         </form>
       </CardContent>
       <CardFooter className="flex-col gap-4">
-        <Button type="submit" className="bg-nvidia hover:bg-nvidia-hover text-black w-full h-10">
+        <Link to="/projects" className="bg-nvidia flex justify-center items-center hover:bg-nvidia-hover text-black w-full h-10">
           Login
-        </Button>
+        </Link>
         {/* <Button variant="outline" className="w-full">
           Login with Google
         </Button> */}

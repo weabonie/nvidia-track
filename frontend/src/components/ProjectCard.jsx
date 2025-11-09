@@ -17,6 +17,8 @@ import { Button } from "./ui/button"
 
 // ProjectCard can accept either a projectName string or a project object
 const ProjectCard = ({ projectName, project }) => {
+  console.log(projectName);
+
   const navigate = useNavigate()
 
   // Derive display name from provided props

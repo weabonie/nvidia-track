@@ -9,6 +9,8 @@ import {
 import Home from "./pages/Home";
 import Layout from './components/Layout'
 import LoginPage from './pages/LoginPage'
+import Dashboard from "./pages/Dashboard";
+import ProjectLayout from "./components/ProjectsLayout";
 
 // import Login from './pages/auth/Login';
 // import Register from './pages/auth/Register';
@@ -41,11 +43,11 @@ const router = createBrowserRouter([
 
    {
     path: "/projects",
-    element: <Layout />,
+    element: <ProjectLayout />,
     children: [
       {
         index: true, // This makes Home the default child route for '/'
-        element: <Home />,
+        element: <Dashboard />,
       },
       // {
       //   path: 'about',

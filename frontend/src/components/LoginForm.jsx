@@ -1,5 +1,5 @@
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 import {
   Card,
@@ -9,14 +9,14 @@ import {
   CardAction,
   CardFooter,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 
 const LoginForm = () => {
   return (
-    <Card className="w-100">
+    <Card className="w-100 bg-[#1d1d1d] border-[#7b7b7b] text-white p-6 shadow-lg py-11">
       <CardHeader className="text-center">
         <CardTitle className="text-2xl">Login to your account</CardTitle>
         {/* <CardDescription>
@@ -34,7 +34,8 @@ const LoginForm = () => {
               <Input
                 id="email"
                 type="email"
-                placeholder="m@example.com"
+                className="bg-[#171717] rounded-sm"
+                // placeholder="m@example.com"  
                 required
               />
             </div>
@@ -43,23 +44,33 @@ const LoginForm = () => {
                 <Label htmlFor="password">Password</Label>
                 <a
                   href="#"
-                  className="text-blue-600 font-medium ml-auto inline-block text-sm underline-offset-4 hover:underline"
+                  className="text-nvidia ml-auto inline-block text-sm underline-offset-4 hover:underline"
                 >
                   Forgot your password?
                 </a>
               </div>
-              <Input id="password" type="password" required />
+              <Input id="password" type="password" className="bg-[#171717] rounded-sm" required />
             </div>
           </div>
         </form>
       </CardContent>
-      <CardFooter className="flex-col gap-2">
-        <Button type="submit" className="w-full h-10">
+      <CardFooter className="flex-col gap-4">
+        <Button type="submit" className="bg-nvidia text-black w-full h-10">
           Login
         </Button>
         {/* <Button variant="outline" className="w-full">
           Login with Google
         </Button> */}
+
+        <span className="font-medium mr-auto inline-block">
+          Don't have an account?{" "}
+          <a
+            href="#"
+            className="text-nvidia underline-offset-4 hover:underline"
+          >
+            Register
+          </a>
+        </span>
       </CardFooter>
     </Card>
   );

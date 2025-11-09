@@ -451,7 +451,7 @@ def generate_docs():
         require_keys(payload, ["name","description","goal","dependencies","installation","pages","repo-name"])
         slug = slugify(payload["repo-name"])
         if not slug: raise ValueError("Invalid repo-name")
-        fqdn = f"{slug}-doc.{BASE_DOMAIN}"
+        fqdn = f"doc-{slug}.{BASE_DOMAIN}"
         logger.info(f"Generated slug: {slug}, FQDN: {fqdn}")
 
         # CRITICAL: If site exists, completely nuke it and its container first

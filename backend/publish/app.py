@@ -172,6 +172,7 @@ def write_minimal_docusaurus(site_dir: Path, site_title: str, site_base_url: str
     (site_dir / "docs").mkdir(parents=True, exist_ok=True)
     (site_dir / "static").mkdir(parents=True, exist_ok=True)
     (site_dir / "src").mkdir(parents=True, exist_ok=True)
+    (site_dir / "src" / "css").mkdir(parents=True, exist_ok=True)
 
     (site_dir / "package.json").write_text(json.dumps({
         "name": site_title.lower().replace(" ", "-"),
@@ -184,14 +185,17 @@ def write_minimal_docusaurus(site_dir: Path, site_title: str, site_base_url: str
         "dependencies": {
             "@docusaurus/core": "3.5.2",
             "@docusaurus/preset-classic": "3.5.2",
+            "prism-react-renderer": "^2.3.0",
             "react": "^18.2.0",
             "react-dom": "^18.2.0"
         }
     }, indent=2), encoding="utf-8")
 
     (site_dir / "docusaurus.config.js").write_text(f"""\
+import {{themes as prismThemes}} from 'prism-react-renderer';
+
 /** @type {{import('@docusaurus/types').Config}} */
-export default {{
+const config = {{
   title: '{site_title}',
   url: 'https://{site_base_url}',
   baseUrl: '/',
@@ -200,26 +204,125 @@ export default {{
   favicon: 'img/favicon.ico',
   organizationName: 'docs', 
   projectName: '{site_title}',
+  
   presets: [
     [
       'classic',
-      {{
+      /** @type {{import('@docusaurus/preset-classic').Options}} */
+      ({{
         docs: {{
           routeBasePath: '/',
           sidebarPath: './sidebars.js',
         }},
         blog: false,
-        theme: {{}}
-      }}
-    ]
+        theme: {{
+          customCss: './src/css/custom.css',
+        }},
+      }}),
+    ],
   ],
-  themeConfig: {{
-    navbar: {{
-      title: '{site_title}',
-      items: []
-    }}
-  }}
+
+  themeConfig:
+    /** @type {{import('@docusaurus/preset-classic').ThemeConfig}} */
+    ({{
+      colorMode: {{
+        defaultMode: 'dark',
+        respectPrefersColorScheme: true,
+      }},
+      navbar: {{
+        title: '{site_title}',
+        items: [],
+      }},
+      prism: {{
+        theme: prismThemes.github,
+        darkTheme: prismThemes.dracula,
+      }},
+    }}),
 }};
+
+export default config;
+""", encoding="utf-8")
+
+    # Create custom NVIDIA green theme CSS
+    (site_dir / "src" / "css" / "custom.css").write_text("""/**
+ * NVIDIA Green Theme for Docusaurus
+ * Primary color: #76B900 (NVIDIA Green)
+ */
+
+:root {
+  /* NVIDIA Green color palette */
+  --ifm-color-primary: #76B900;
+  --ifm-color-primary-dark: #6aa600;
+  --ifm-color-primary-darker: #649d00;
+  --ifm-color-primary-darkest: #528100;
+  --ifm-color-primary-light: #82cc00;
+  --ifm-color-primary-lighter: #88d500;
+  --ifm-color-primary-lightest: #9ee116;
+  
+  /* Code block background */
+  --ifm-code-font-size: 95%;
+  
+  /* Link colors */
+  --ifm-link-color: #76B900;
+  --ifm-link-hover-color: #6aa600;
+}
+
+/* Dark mode adjustments */
+[data-theme='dark'] {
+  --ifm-color-primary: #82cc00;
+  --ifm-color-primary-dark: #76b900;
+  --ifm-color-primary-darker: #6aa600;
+  --ifm-color-primary-darkest: #5e9300;
+  --ifm-color-primary-light: #88d500;
+  --ifm-color-primary-lighter: #9ee116;
+  --ifm-color-primary-lightest: #a8e62c;
+  
+  --ifm-link-color: #82cc00;
+  --ifm-link-hover-color: #9ee116;
+}
+
+/* Navbar styling */
+.navbar {
+  background-color: #1a1a1a;
+  border-bottom: 2px solid #76B900;
+}
+
+.navbar__title {
+  color: #76B900 !important;
+  font-weight: 600;
+}
+
+/* Sidebar active item */
+.menu__link--active {
+  background-color: rgba(118, 185, 0, 0.1);
+  border-left: 3px solid #76B900;
+}
+
+/* Code blocks with NVIDIA accent */
+.prism-code {
+  border-left: 3px solid #76B900;
+}
+
+/* Buttons and interactive elements */
+.button--primary {
+  background-color: #76B900;
+  border-color: #76B900;
+}
+
+.button--primary:hover {
+  background-color: #6aa600;
+  border-color: #6aa600;
+}
+
+/* Headings accent */
+h1, h2, h3, h4, h5, h6 {
+  color: inherit;
+}
+
+article h1 {
+  border-bottom: 3px solid #76B900;
+  padding-bottom: 0.5rem;
+}
 """, encoding="utf-8")
 
     # Build sidebar from pages input

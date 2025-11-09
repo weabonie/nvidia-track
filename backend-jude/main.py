@@ -745,64 +745,57 @@ IMPORTANT: Generate 7-10 SPECIFIC sections based on what you see above. Each sec
         prompt = ChatPromptTemplate.from_messages([
             ('system', '''You are a technical documentation architect analyzing a REAL repository.
 
-Based on the ACTUAL files, code, and structure you see, create 7-10 comprehensive documentation sections that make sense for THIS SPECIFIC project.
+YOUR TASK: Create 7-10 comprehensive documentation sections for this project.
 
-REQUIREMENTS:
-- You MUST create at least 7 distinct sections (aim for 8-10 for comprehensive coverage)
-- Base sections on what you ACTUALLY see in the code and files
-- Be SPECIFIC - reference actual files, classes, features, or technologies you observe
-- DO NOT use placeholder descriptions
-- DO NOT use markdown formatting in section titles (no **, __, *, etc.)
-- Use plain text for section titles (e.g., "Introduction" not "**Introduction**")
-- Each description should be 1-3 sentences explaining what that section will cover
+CRITICAL REQUIREMENTS:
+- You MUST return a valid object with a "pages" field containing a dictionary
+- The dictionary MUST have 7-10 key-value pairs (section name to description)
+- Each section name must be a clear, plain text title (no markdown, no numbering)
+- Each description must be 1-3 sentences about what that section covers
+- DO NOT return an empty dictionary
+- DO NOT return null or undefined
 
 Section ideas based on project type:
 
 For GAMES (Unity/Unreal/Godot):
-- Project Overview: What the game is about, genre, core concept
-- Getting Started: Opening the project, Unity version, initial setup
-- Game Features: Gameplay mechanics, systems, unique features (reference actual scripts)
-- Core Systems: Character controllers, physics, AI, input systems (reference actual .cs files)
-- Level Design: Scene structure, prefabs, environment setup
-- Art & Assets: Visual style, asset organization, materials, sprites
-- Audio System: Sound effects, music, audio management (if audio files present)
-- Scripts & Components: Key C# scripts and their purposes (reference actual script names)
-- Building & Deployment: How to build for different platforms
-- Troubleshooting: Common issues and solutions
+- Project Overview, Getting Started, Game Features, Core Systems, Level Design, Art & Assets, Audio System, Scripts & Components, Building & Deployment, Troubleshooting
 
 For WEB APPS (React/Vue/Next.js/Express):
-- Introduction: Purpose, target users, key value proposition
-- Quick Start: Fastest way to get running locally
-- Installation: Detailed setup with all dependencies
-- Architecture: Project structure, design patterns, key directories
-- Configuration: Environment variables, config files, API keys
-- Features: Core functionality with code examples
-- API Documentation: Endpoints, request/response examples (if backend present)
-- Components: Reusable UI components and their props (if frontend)
-- Database: Schema, models, migrations (if applicable)
-- Deployment: Hosting, CI/CD, production setup
-- Contributing: Development workflow, PR guidelines
+- Introduction, Quick Start, Installation, Architecture, Configuration, Features, API Documentation, Components, Database, Deployment, Contributing
 
 For LIBRARIES/TOOLS:
-- Introduction: What it does, who it's for
-- Installation: Package installation, dependencies
-- Quick Start: Simplest usage example
-- Usage Guide: Common use cases with examples
-- API Reference: Functions, classes, methods
-- Configuration: Options and customization
-- Advanced Features: Complex scenarios
-- Examples: Real-world use cases
-- Troubleshooting: Common issues
-- Contributing: How to contribute
+- Introduction, Installation, Quick Start, Usage Guide, API Reference, Configuration, Advanced Features, Examples, Troubleshooting, Contributing
 
-Each section description should mention SPECIFIC files, classes, or features from this project when possible.'''),
+IMPORTANT: Base sections on what you ACTUALLY see in the code and files. Reference specific files, classes, or technologies when possible.'''),
             ('human', '{context}')
         ])
         chain = prompt | structured_llm
-        response = chain.invoke({ 'context': context_summary })
         
-        logger.info(f"LLM generated {len(response.pages)} documentation sections")
-        logger.debug(f"Raw LLM pages: {response.pages}")
+        try:
+            response = chain.invoke({ 'context': context_summary })
+            logger.info(f"LLM response type: {type(response)}")
+            logger.info(f"LLM response: {response}")
+            
+            # Check if response has pages attribute
+            if not hasattr(response, 'pages'):
+                logger.error(f"LLM response missing 'pages' attribute! Response: {response}")
+                raise ValueError("LLM did not return valid Pages schema")
+            
+            logger.info(f"LLM generated {len(response.pages)} documentation sections")
+            logger.debug(f"Raw LLM pages: {response.pages}")
+        except Exception as llm_error:
+            logger.error(f"LLM invocation failed: {llm_error}", exc_info=True)
+            logger.warning("Using fallback page generation due to LLM error")
+            # Return generic fallback immediately
+            return {
+                "Introduction": f"Overview of this project built with {', '.join(dependencies[:3]) if dependencies else 'various technologies'}.",
+                "Quick Start": "Getting started guide with setup instructions.",
+                "Installation": "Detailed installation and setup instructions.",
+                "Features": "Guide to the main features and functionality.",
+                "Configuration": "Configuration options and environment setup.",
+                "Usage Examples": "Practical usage examples.",
+                "Contributing": "Guidelines for contributing to the project."
+            }
         
         # Sanitize page titles - remove markdown formatting and filter out empty/bad pages
         sanitized_pages = {}

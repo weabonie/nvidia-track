@@ -27,13 +27,6 @@ const LoginPage = () => {
           }`}
           onLoad={() => setImageLoaded(true)}
         />
-
-        {/* Floating particles effect */}
-        <div className="absolute inset-0 z-5 pointer-events-none">
-          <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-[#76B900] rounded-full animate-pulse opacity-60"></div>
-          <div className="absolute top-3/4 right-1/3 w-3 h-3 bg-[#76B900] rounded-full animate-pulse opacity-40" style={{ animationDelay: "0.5s" }}></div>
-          <div className="absolute top-1/2 right-1/4 w-2 h-2 bg-[#76B900] rounded-full animate-pulse opacity-50" style={{ animationDelay: "1s" }}></div>
-        </div>
       </div>
     </div>
   );

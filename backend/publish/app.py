@@ -53,6 +53,50 @@ def slugify(s: str) -> str:
     s = re.sub(r"[^a-z0-9]+", "-", s)
     return re.sub(r"-+", "-", s).strip("-")
 
+def clean_page_name(name: str) -> str:
+    """Remove markdown and special formatting from page names."""
+    # Remove markdown bold
+    name = re.sub(r'\*\*([^*]+)\*\*', r'\1', name)
+    # Remove markdown italic
+    name = re.sub(r'\*([^*]+)\*', r'\1', name)
+    name = re.sub(r'_([^_]+)_', r'\1', name)
+    # Remove markdown links
+    name = re.sub(r'\[([^\]]+)\]\([^)]+\)', r'\1', name)
+    # Remove backticks
+    name = name.replace('`', '')
+    # Remove remaining asterisks
+    name = name.replace('*', '')
+    # Remove angle brackets
+    name = name.replace('<', '').replace('>', '')
+    return name.strip()
+
+def is_valid_page_name(name: str) -> bool:
+    """
+    Filter out invalid/junk page names that the AI might generate.
+    Returns True if the page name is valid, False if it should be filtered out.
+    """
+    name_lower = name.lower()
+    
+    # Filter out garbage patterns
+    invalid_patterns = [
+        r'documentation\s+(sections|for)',  # "Documentation sections for..."
+        r'\.github',  # ".github/ (2 files)" type stuff
+        r'\d+\s+files?',  # "2 files", "10 files"
+        r'^\*\*.*\*\*$',  # Just bold text with no real content
+        r'repo.*name',  # "repo-name" type stuff
+        r'^\s*$',  # Empty or whitespace only
+    ]
+    
+    for pattern in invalid_patterns:
+        if re.search(pattern, name_lower):
+            return False
+    
+    # Must have some actual text content (not just special chars)
+    if len(re.sub(r'[^a-zA-Z]', '', name)) < 3:
+        return False
+    
+    return True
+
 def require_keys(obj: Dict[str, Any], ks):
     miss = [k for k in ks if k not in obj]
     if miss: raise ValueError("Missing keys: " + ", ".join(miss))
@@ -72,13 +116,27 @@ def call_ollama(payload: Dict[str, Any]) -> Dict[str, Any]:
 CRITICAL RULES:
 1. Output ONLY valid JSON - no markdown, no code fences, no commentary
 2. All files MUST have YAML front matter with id, title, and sidebar_position
-3. File paths must be docs/SLUG.md where SLUG is lowercase-with-dashes
-4. Create comprehensive, well-structured documentation content
-5. NEVER USE CURLY BRACES for parameters - use :parameter or [parameter] syntax instead
-   Example: /api/users/:id or /api/users/[id] (NOT /api/users/{id})
-6. This is MDX format - curly braces cause React errors
-7. CODE BLOCKS: Always close code blocks properly with three backticks
-8. Never use malformed code fences
+3. YAML FRONTMATTER RULES (CRITICAL):
+   - Use PLAIN TEXT ONLY in YAML fields (id, title, sidebar_position)
+   - NO markdown syntax in frontmatter: no **, *, _, `, [], or other formatting
+   - Example GOOD: "title: Introduction to the Project"
+   - Example BAD: "title: **Introduction** to the _Project_"
+4. File paths must be docs/SLUG.md where SLUG is lowercase-with-dashes
+5. Create comprehensive, well-structured documentation content
+6. ABSOLUTELY NO SPECIAL CHARACTERS for placeholders - MDX/React interprets them as code
+   - For API paths with parameters, use UPPERCASE: /api/users/USER_ID or /api/users/USERID
+   - For placeholders: use UPPERCASE_WORDS like PROJECT_ID, USER_NAME, etc.
+   - NEVER use: {}, <>, :, or any symbols OUTSIDE code blocks - ONLY letters, numbers, underscore, hyphen
+7. CODE BLOCKS: CRITICAL FORMATTING
+   - Use EXACTLY three backticks (```) at start of code block on its own line
+   - NEVER write "code```" or "Example:```" or put ANY text before the backticks
+   - Put backticks on their OWN line: text here, then newline, then ```
+   - Format: ```language on one line, then code, then ``` on its own line
+   - Always close code blocks properly with three backticks on their own line
+   - Inside code blocks, write COMPLETE, VALID code - no incomplete JSX attributes
+   - If showing JSX/React: use COMPLETE props like data={{}} or options={{}} not data= or options=
+8. Never use malformed code fences or incomplete code examples
+9. Keep it simple - use plain text and UPPERCASE for placeholders OUTSIDE code blocks
 
 JSON SCHEMA (FOLLOW EXACTLY):
 {
@@ -89,12 +147,26 @@ JSON SCHEMA (FOLLOW EXACTLY):
 
     # Build file list from pages input
     pages = payload.get('pages', {})
+    
+    # CRITICAL: Filter out junk page names before processing
+    valid_pages = {}
+    for page_name, page_desc in pages.items():
+        if is_valid_page_name(page_name):
+            valid_pages[page_name] = page_desc
+        else:
+            logger.warning(f"Filtering out invalid page name: '{page_name}'")
+    
+    if not valid_pages:
+        raise ValueError("No valid pages found after filtering. Check your 'pages' input.")
+    
+    pages = valid_pages  # Use only valid pages
     file_instructions = []
     for i, (page_name, page_desc) in enumerate(pages.items(), 1):
-        file_slug = slugify(page_name)
+        clean_name = clean_page_name(page_name)
+        file_slug = slugify(clean_name)
         file_instructions.append(f"""
 {i}. docs/{file_slug}.md (id: {file_slug}, sidebar_position: {i})
-   Page Title: "{page_name}"
+   Page Title: "{clean_name}"
    Content Focus: {page_desc}
    - Use project info to create relevant content
    - Include code examples where appropriate
@@ -109,17 +181,28 @@ PROJECT INFO:
 - Dependencies: {', '.join(payload.get('dependencies', []))}
 - Installation Steps: {', '.join(payload.get('installation', []))}
 
-CREATE EXACTLY {len(pages)} FILES:
+CREATE EXACTLY {len(pages)} FILES - NO MORE, NO LESS:
 {''.join(file_instructions)}
 
-IMPORTANT:
-- First file ({list(pages.keys())[0]}) is the HOMEPAGE
-- Use YAML front matter: id, title, sidebar_position
-- Make content detailed and useful based on page description
-- Include code blocks with proper syntax highlighting
-- Use Markdown formatting (headers, lists, links, etc.)
+CRITICAL INSTRUCTIONS:
+- Create ONLY the {len(pages)} files listed above - DO NOT create any additional files
+- DO NOT create extra files like "title.md" or duplicate "introduction.md"
+- The file list above is COMPLETE and EXHAUSTIVE
+- First file ({clean_page_name(list(pages.keys())[0])}) is the HOMEPAGE - don't create a separate title page
+- Use YAML front matter: id, title, sidebar_position (plain text only, no markdown)
+- CONTENT REQUIREMENTS:
+  * Write FOCUSED, PROFESSIONAL documentation - quality over quantity
+  * Each section should have 2-3 paragraphs of useful, specific content (avoid fluff)
+  * Include subsections with ##, ### headers for structure
+  * Add practical examples based on the tech stack ({', '.join(payload.get('dependencies', []))})
+  * Include 1-2 code examples per page with syntax highlighting
+  * Make it informative and USEFUL - avoid generic language
+  * Infer details from tech stack - Unity→GameObjects/Scenes, React→Components, etc.
+  * BE SPECIFIC - use project name, dependencies, installation steps
+  * KEEP IT CONCISE - focus on quality, not length
+- Use Markdown formatting (headers, lists, links, code blocks)
 
-OUTPUT: JSON with "files" array only. No other text."""
+OUTPUT: JSON with "files" array containing EXACTLY {len(pages)} file objects. No other text."""
 
     r = requests.post(OLLAMA_URL, json={
         "model": OLLAMA_MODEL,
@@ -129,13 +212,27 @@ OUTPUT: JSON with "files" array only. No other text."""
         ],
         "format":"json",
         "stream":False
-    }, timeout=120)
+    }, timeout=240)  # Increased timeout to 240 seconds (4 minutes)
     r.raise_for_status()
     content = r.json().get("message",{}).get("content")
     if not content: raise RuntimeError("Ollama returned empty content")
     
     # Log raw response for debugging
     logger.debug(f"Raw Ollama response: {content[:500]}...")
+    
+    # CRITICAL: Fix incomplete JSON if it's truncated
+    content = content.strip()
+    if not content.endswith("}"):
+        logger.warning("Ollama response appears truncated, attempting to fix...")
+        # Try to close the JSON properly
+        # Find the last complete file object
+        last_brace_idx = content.rfind("}")
+        if last_brace_idx > 0:
+            # Truncate to last complete object and close the array and root object
+            content = content[:last_brace_idx + 1] + "]}"
+            logger.info(f"Fixed truncated JSON, new length: {len(content)}")
+        else:
+            logger.error("Could not fix truncated JSON")
     
     try:
         bundle = json.loads(content)
@@ -158,7 +255,30 @@ OUTPUT: JSON with "files" array only. No other text."""
         if "path" not in f or "content" not in f:
             raise RuntimeError(f"File {i} missing required keys. Has: {list(f.keys())}")
     
+    # CRITICAL: Filter out any files that don't match expected page slugs
+    # This prevents Ollama from hallucinating extra files
+    expected_slugs = set(slugify(clean_page_name(page_name)) for page_name in pages.keys())
+    original_count = len(bundle["files"])
+    
+    filtered_files = []
+    for f in bundle["files"]:
+        path = f.get("path", "")
+        # Extract slug from path (e.g., "docs/introduction.md" -> "introduction")
+        if path.startswith("docs/") and path.endswith(".md"):
+            file_slug = path[5:-3]  # Remove "docs/" prefix and ".md" suffix
+            if file_slug in expected_slugs:
+                filtered_files.append(f)
+            else:
+                logger.warning(f"Filtering out unexpected file: {path} (slug: {file_slug})")
+    
+    bundle["files"] = filtered_files
+    if len(filtered_files) < original_count:
+        logger.info(f"Filtered {original_count - len(filtered_files)} unexpected files. Kept {len(filtered_files)} expected files.")
+    
     logger.info(f"Files to be created: {[f.get('path') for f in bundle['files']]}")
+    
+    # Return both the bundle and the cleaned pages dict
+    bundle["cleaned_pages"] = pages
     return bundle
 
 def write_minimal_docusaurus(site_dir: Path, site_title: str, site_base_url: str, pages: dict):
@@ -166,6 +286,7 @@ def write_minimal_docusaurus(site_dir: Path, site_title: str, site_base_url: str
     (site_dir / "docs").mkdir(parents=True, exist_ok=True)
     (site_dir / "static").mkdir(parents=True, exist_ok=True)
     (site_dir / "src").mkdir(parents=True, exist_ok=True)
+    (site_dir / "src" / "css").mkdir(parents=True, exist_ok=True)
 
     (site_dir / "package.json").write_text(json.dumps({
         "name": site_title.lower().replace(" ", "-"),
@@ -178,14 +299,17 @@ def write_minimal_docusaurus(site_dir: Path, site_title: str, site_base_url: str
         "dependencies": {
             "@docusaurus/core": "3.5.2",
             "@docusaurus/preset-classic": "3.5.2",
+            "prism-react-renderer": "^2.3.0",
             "react": "^18.2.0",
             "react-dom": "^18.2.0"
         }
     }, indent=2), encoding="utf-8")
 
     (site_dir / "docusaurus.config.js").write_text(f"""\
+import {{themes as prismThemes}} from 'prism-react-renderer';
+
 /** @type {{import('@docusaurus/types').Config}} */
-export default {{
+const config = {{
   title: '{site_title}',
   url: 'https://{site_base_url}',
   baseUrl: '/',
@@ -194,33 +318,133 @@ export default {{
   favicon: 'img/favicon.ico',
   organizationName: 'docs', 
   projectName: '{site_title}',
+  
   presets: [
     [
       'classic',
-      {{
+      /** @type {{import('@docusaurus/preset-classic').Options}} */
+      ({{
         docs: {{
           routeBasePath: '/',
           sidebarPath: './sidebars.js',
         }},
         blog: false,
-        theme: {{}}
-      }}
-    ]
+        theme: {{
+          customCss: './src/css/custom.css',
+        }},
+      }}),
+    ],
   ],
-  themeConfig: {{
-    navbar: {{
-      title: '{site_title}',
-      items: []
-    }}
-  }}
+
+  themeConfig:
+    /** @type {{import('@docusaurus/preset-classic').ThemeConfig}} */
+    ({{
+      colorMode: {{
+        defaultMode: 'dark',
+        respectPrefersColorScheme: true,
+      }},
+      navbar: {{
+        title: '{site_title}',
+        items: [],
+      }},
+      prism: {{
+        theme: prismThemes.github,
+        darkTheme: prismThemes.dracula,
+      }},
+    }}),
 }};
+
+export default config;
+""", encoding="utf-8")
+
+    # Create custom NVIDIA green theme CSS
+    (site_dir / "src" / "css" / "custom.css").write_text("""/**
+ * NVIDIA Green Theme for Docusaurus
+ * Primary color: #76B900 (NVIDIA Green)
+ */
+
+:root {
+  /* NVIDIA Green color palette */
+  --ifm-color-primary: #76B900;
+  --ifm-color-primary-dark: #6aa600;
+  --ifm-color-primary-darker: #649d00;
+  --ifm-color-primary-darkest: #528100;
+  --ifm-color-primary-light: #82cc00;
+  --ifm-color-primary-lighter: #88d500;
+  --ifm-color-primary-lightest: #9ee116;
+  
+  /* Code block background */
+  --ifm-code-font-size: 95%;
+  
+  /* Link colors */
+  --ifm-link-color: #76B900;
+  --ifm-link-hover-color: #6aa600;
+}
+
+/* Dark mode adjustments */
+[data-theme='dark'] {
+  --ifm-color-primary: #82cc00;
+  --ifm-color-primary-dark: #76b900;
+  --ifm-color-primary-darker: #6aa600;
+  --ifm-color-primary-darkest: #5e9300;
+  --ifm-color-primary-light: #88d500;
+  --ifm-color-primary-lighter: #9ee116;
+  --ifm-color-primary-lightest: #a8e62c;
+  
+  --ifm-link-color: #82cc00;
+  --ifm-link-hover-color: #9ee116;
+}
+
+/* Navbar styling */
+.navbar {
+  background-color: #1a1a1a;
+  border-bottom: 2px solid #76B900;
+}
+
+.navbar__title {
+  color: #76B900 !important;
+  font-weight: 600;
+}
+
+/* Sidebar active item */
+.menu__link--active {
+  background-color: rgba(118, 185, 0, 0.1);
+  border-left: 3px solid #76B900;
+}
+
+/* Code blocks with NVIDIA accent */
+.prism-code {
+  border-left: 3px solid #76B900;
+}
+
+/* Buttons and interactive elements */
+.button--primary {
+  background-color: #76B900;
+  border-color: #76B900;
+}
+
+.button--primary:hover {
+  background-color: #6aa600;
+  border-color: #6aa600;
+}
+
+/* Headings accent */
+h1, h2, h3, h4, h5, h6 {
+  color: inherit;
+}
+
+article h1 {
+  border-bottom: 3px solid #76B900;
+  padding-bottom: 0.5rem;
+}
 """, encoding="utf-8")
 
     # Build sidebar from pages input
     sidebar_items = []
     for i, (page_name, _) in enumerate(pages.items(), 1):
-        file_slug = slugify(page_name)
-        sidebar_items.append(f'    {{type: "doc", id: "{file_slug}", label: "{page_name}"}}')
+        clean_name = clean_page_name(page_name)
+        file_slug = slugify(clean_name)
+        sidebar_items.append(f'    {{type: "doc", id: "{file_slug}", label: "{clean_name}"}}')
     
     sidebar_content = ",\n".join(sidebar_items)
     (site_dir / "sidebars.js").write_text(f"""\
@@ -234,9 +458,12 @@ export default {{
 
 def fix_mdx_curly_braces(content: str) -> str:
     """
-    Escape single curly braces in MDX content to prevent React errors.
-    MDX treats {variable} as JavaScript expressions, so we need {{variable}} for literals.
-    This function preserves code blocks, fixes malformed code fences, and escapes braces outside code blocks.
+    SANITIZE MDX content to prevent React/JSX parsing errors.
+    - Remove problematic curly braces OUTSIDE code blocks (MDX treats them as JS expressions)
+    - Replace angle brackets that look like HTML/JSX tags OUTSIDE code blocks
+    - Replace :param syntax with safe UPPERCASE
+    - Fix malformed code fences
+    - Preserves code blocks and frontmatter completely unchanged.
     """
     lines = content.split('\n')
     result = []
@@ -257,6 +484,19 @@ def fix_mdx_curly_braces(content: str) -> str:
         
         # Fix malformed code fences - check for ``' or other common issues
         stripped = line.strip()
+        
+        # CRITICAL: Fix "code```" pattern (common LLM mistake)
+        if 'code```' in stripped:
+            logger.warning(f"Line {i+1}: Found 'code```' pattern, fixing to '```'")
+            line = stripped.replace('code```', '```')
+            stripped = line.strip()
+        
+        # CRITICAL: Fix "Example:```" or any "text```" pattern
+        if re.search(r'\w```', stripped):
+            logger.warning(f"Line {i+1}: Found text immediately before ```, fixing")
+            line = re.sub(r'(\w)(```)', r'\1\n\2', line)
+            stripped = line.strip()
+        
         if stripped.startswith('``') and not stripped.startswith('```'):
             # Likely a malformed code fence like ``' or ``
             logger.warning(f"Line {i+1}: Found malformed code fence '{stripped}', fixing to '```'")
@@ -269,18 +509,48 @@ def fix_mdx_curly_braces(content: str) -> str:
             result.append(line)
             continue
         
-        # Don't modify code blocks or frontmatter
+        # Don't modify code blocks or frontmatter - preserve them EXACTLY
         if in_code_block or in_frontmatter:
             result.append(line)
             continue
-        
-        # Escape single curly braces outside of code blocks
-        # Replace {anything} with {{anything}} but avoid {{ and }} already escaped
+
+        # Only modify text OUTSIDE code blocks
         modified_line = line
-        # Use regex to find single curly braces and escape them
-        modified_line = re.sub(r'(?<!\{)\{(?!\{)', '{{', modified_line)  # { -> {{
-        modified_line = re.sub(r'(?<!\})\}(?!\})', '}}', modified_line)  # } -> }}
         
+        # Remove curly braces that are NOT in inline code (backticks)
+        # Strategy: protect inline code, then remove braces, then restore inline code
+        inline_code_parts = []
+        def save_inline_code(match):
+            inline_code_parts.append(match.group(0))
+            return f"__INLINE_CODE_{len(inline_code_parts)-1}__"
+        
+        # Protect inline code
+        modified_line = re.sub(r'`[^`]+`', save_inline_code, modified_line)
+        
+        # Now remove curly braces (both matched pairs AND orphaned ones)
+        modified_line = re.sub(r"\{[^}]*\}", "", modified_line)
+        modified_line = modified_line.replace('{', '').replace('}', '')
+        
+        # Restore inline code
+        for idx, code in enumerate(inline_code_parts):
+            modified_line = modified_line.replace(f"__INLINE_CODE_{idx}__", code)
+
+        # Replace :param patterns with PARAM name (drop the colon) - OUTSIDE inline code
+        inline_code_parts = []
+        modified_line = re.sub(r'`[^`]+`', save_inline_code, modified_line)
+        modified_line = re.sub(r':([a-zA-Z_][a-zA-Z0-9_]*)', r'\1', modified_line)
+        for idx, code in enumerate(inline_code_parts):
+            modified_line = modified_line.replace(f"__INLINE_CODE_{idx}__", code)
+
+        # Replace <placeholder> patterns with PLACEHOLDER (MDX thinks these are HTML tags!)
+        # But NOT in inline code or if it looks like a real HTML tag
+        inline_code_parts = []
+        modified_line = re.sub(r'`[^`]+`', save_inline_code, modified_line)
+        # Only replace simple placeholders, not complex HTML-like tags
+        modified_line = re.sub(r'<([a-zA-Z][a-zA-Z0-9_-]*)>', r'\1', modified_line)
+        for idx, code in enumerate(inline_code_parts):
+            modified_line = modified_line.replace(f"__INLINE_CODE_{idx}__", code)
+
         result.append(modified_line)
     
     # Check if we ended with an unclosed code block
@@ -290,16 +560,61 @@ def fix_mdx_curly_braces(content: str) -> str:
     
     return '\n'.join(result)
 
+def sanitize_yaml_frontmatter(content: str) -> str:
+    """
+    Remove markdown formatting and special characters from YAML frontmatter fields.
+    This prevents YAML parsing errors from markdown syntax in frontmatter values.
+    """
+    if not content.startswith("---"):
+        return content
+    
+    lines = content.split("\n")
+    frontmatter_end = -1
+    
+    # Find end of frontmatter
+    for i in range(1, len(lines)):
+        if lines[i].strip() == "---":
+            frontmatter_end = i
+            break
+    
+    if frontmatter_end == -1:
+        return content
+    
+    # Process frontmatter lines
+    for i in range(1, frontmatter_end):
+        line = lines[i]
+        # Check if it's a key-value pair
+        if ":" in line:
+            key, value = line.split(":", 1)
+            # Strip markdown bold (**text**)
+            value = re.sub(r'\*\*([^*]+)\*\*', r'\1', value)
+            # Strip markdown italic (*text* or _text_)
+            value = re.sub(r'\*([^*]+)\*', r'\1', value)
+            value = re.sub(r'_([^_]+)_', r'\1', value)
+            # Strip markdown links [text](url)
+            value = re.sub(r'\[([^\]]+)\]\([^)]+\)', r'\1', value)
+            # Strip backticks
+            value = value.replace('`', '')
+            # Strip any remaining asterisks
+            value = value.replace('*', '')
+            lines[i] = f"{key}:{value}"
+    
+    return "\n".join(lines)
+
 def write_docs(site_dir: Path, files, pages: dict):
     # Get the first page info (this will be the homepage)
     first_page_name = list(pages.keys())[0]
-    first_page_slug = slugify(first_page_name)
+    first_page_clean = clean_page_name(first_page_name)
+    first_page_slug = slugify(first_page_clean)
     
     for f in files:
         rel = f.get("path"); content = f.get("content","")
         if not rel or not isinstance(rel, str): continue
         out = site_dir / rel
         out.parent.mkdir(parents=True, exist_ok=True)
+        
+        # CRITICAL: Remove markdown formatting from YAML frontmatter
+        content = sanitize_yaml_frontmatter(content)
         
         # CRITICAL: Escape unescaped curly braces for MDX (outside of code blocks)
         # This prevents React/MDX errors when using {id}, {param}, etc. in text
@@ -330,7 +645,8 @@ def write_docs(site_dir: Path, files, pages: dict):
     
     # CRITICAL: Ensure ALL expected pages exist (create fallbacks for missing ones)
     for i, (page_name, page_desc) in enumerate(pages.items(), 1):
-        page_slug = slugify(page_name)
+        clean_name = clean_page_name(page_name)
+        page_slug = slugify(clean_name)
         page_file = site_dir / "docs" / f"{page_slug}.md"
         
         if not page_file.exists():
@@ -338,12 +654,12 @@ def write_docs(site_dir: Path, files, pages: dict):
             is_homepage = (i == 1)
             page_file.write_text(f"""---
 id: {page_slug}
-title: {page_name}
+title: {clean_name}
 sidebar_position: {i}
 {('slug: /' if is_homepage else '')}
 ---
 
-# {page_name}
+# {clean_name}
 
 {page_desc}
 
@@ -355,11 +671,25 @@ def write_docker(site_dir: Path):
     (site_dir / "Dockerfile").write_text("""\
 FROM node:18-alpine
 WORKDIR /site
-COPY package.json package-lock.json* yarn.lock* pnpm-lock.yaml* .npmrc* ./
-RUN npm ci || npm i
+
+# Install http-server globally first
+RUN npm install -g http-server
+
+# Copy package files
+COPY package.json ./
+
+# Install dependencies (no lockfile, so use npm install)
+RUN npm install --legacy-peer-deps
+
+# Copy site source
 COPY . .
+
+# Build static site
+RUN npx docusaurus build
+
 EXPOSE 3000
-CMD ["npx", "docusaurus", "start", "--host", "0.0.0.0", "--port", "3000"]
+# Serve the static build
+CMD ["http-server", "build", "-p", "3000", "-a", "0.0.0.0"]
 """, encoding="utf-8")
 
     (site_dir / "docker-compose.yml").write_text("""\
@@ -383,6 +713,14 @@ def docker_up(site_dir: Path, image: str, container: str, port: int):
     
     # Build with --no-cache to ensure completely fresh build (no cached layers)
     logger.info(f"Building fresh Docker image with --no-cache...")
+    # Remove any local build caches before building
+    for cache_dir in [site_dir / '.docusaurus', site_dir / 'node_modules' / '.cache']:
+        if cache_dir.exists():
+            try:
+                shutil.rmtree(cache_dir)
+                logger.info(f"Removed local cache directory: {cache_dir}")
+            except Exception as cache_err:
+                logger.warning(f"Failed to remove cache {cache_dir}: {cache_err}")
     subprocess.check_call([
         "docker", "build",
         "--no-cache",
@@ -404,6 +742,51 @@ def docker_up(site_dir: Path, image: str, container: str, port: int):
         "up", "-d", "--force-recreate"
     ], cwd=site_dir, env=env)
 
+def enhance_project_description(payload: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Enhance bland or empty project descriptions using available context.
+    Generates richer descriptions from project metadata.
+    """
+    description = payload.get("description", "").strip()
+    goal = payload.get("goal", "").strip()
+    name = payload.get("name", "").strip()
+    dependencies = payload.get("dependencies", [])
+    
+    # Check if description is weak/empty
+    if len(description) < 50 or not description:
+        logger.info("Description is weak/empty, generating enhanced description...")
+        
+        # Build a richer description from context
+        enhanced_parts = []
+        
+        if name:
+            enhanced_parts.append(f"{name} is")
+        
+        # Add goal if meaningful
+        if goal and len(goal) > 10 and goal.lower() != name.lower():
+            enhanced_parts.append(goal.rstrip('.'))
+        
+        # Add tech stack description
+        if dependencies:
+            tech_desc = "built with " + ", ".join(dependencies[:3])
+            if len(dependencies) > 3:
+                tech_desc += f" and {len(dependencies) - 3} more technologies"
+            enhanced_parts.append(tech_desc)
+        
+        # Construct final description
+        if enhanced_parts:
+            description = " ".join(enhanced_parts) + "."
+            logger.info(f"Enhanced description: {description}")
+            payload["description"] = description
+    
+    # Enhance goal if it's too generic
+    if len(goal) < 30 or goal.lower() in ["project", "specific project analysis", name.lower()]:
+        logger.info("Goal is too generic, enhancing...")
+        if dependencies:
+            payload["goal"] = f"A comprehensive {dependencies[0] if dependencies else 'software'} project focused on delivering robust functionality and excellent user experience"
+    
+    return payload
+
 @app.route("/generate-docs", methods=["POST"])
 def generate_docs():
     try:
@@ -412,9 +795,12 @@ def generate_docs():
         logger.info(f"Received payload: {json.dumps(payload, indent=2)}")
         
         require_keys(payload, ["name","description","goal","dependencies","installation","pages","repo-name"])
+        
+        # Enhance weak descriptions
+        payload = enhance_project_description(payload)
         slug = slugify(payload["repo-name"])
         if not slug: raise ValueError("Invalid repo-name")
-        fqdn = f"{slug}-doc.{BASE_DOMAIN}"
+        fqdn = f"doc-{slug}.{BASE_DOMAIN}"
         logger.info(f"Generated slug: {slug}, FQDN: {fqdn}")
 
         # CRITICAL: If site exists, completely nuke it and its container first
@@ -446,14 +832,17 @@ def generate_docs():
         logger.info("Step 1: Calling Ollama to generate docs...")
         bundle = call_ollama(payload)
         logger.info(f"Ollama returned {len(bundle.get('files', []))} files")
+        
+        # Use cleaned pages from validation
+        cleaned_pages = bundle.pop("cleaned_pages", payload["pages"])
 
         # 2) Minimal docusaurus scaffold
         logger.info("Step 2: Writing Docusaurus scaffold...")
-        write_minimal_docusaurus(site_dir, site_title=payload["name"], site_base_url=fqdn, pages=payload["pages"])
+        write_minimal_docusaurus(site_dir, site_title=payload["name"], site_base_url=fqdn, pages=cleaned_pages)
 
         # 3) Write docs
         logger.info("Step 3: Writing generated docs...")
-        write_docs(site_dir, bundle["files"], payload["pages"])
+        write_docs(site_dir, bundle["files"], cleaned_pages)
 
         # 4) Dockerize and run
         logger.info("Step 4: Creating Docker files and building...")

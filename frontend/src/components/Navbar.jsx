@@ -6,11 +6,11 @@ const Navbar = () => {
 
   return (
     <nav className="bg-black/95 backdrop-blur-sm text-white border-b border-gray-800/50 sticky top-0 z-50 animate-slide-down">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
+      <div className="max-w-[97rem] mx-auto lg:px-8">
         <div className="flex justify-between items-center h-20">
           {/* Logo - Simplified */}
           <Link to="/" className="text-2xl font-bold text-[#76B900] hover:text-[#5d9100] transition-colors">
-            NVIDIA Track
+            AutoDoc
           </Link>
 
           {/* Desktop CTA Button - Single Focus */}

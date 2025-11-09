@@ -12,7 +12,7 @@ import LoginPage from './pages/LoginPage'
 import Dashboard from "./pages/Dashboard";
 import ProjectLayout from "./components/ProjectsLayout";
 import ProjectDetails from "./pages/ProjectDetails";
-import ProjectOverview from "./pages/ProjectOverview";
+import ProjectOverview from "./pages/ProjectOverviewFixed";
 
 // import Login from './pages/auth/Login';
 // import Register from './pages/auth/Register';

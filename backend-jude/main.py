@@ -1,3 +1,4 @@
+from requests.utils import requote_uri
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from langchain_openai import ChatOpenAI
@@ -26,7 +27,7 @@ from schemas.Pages import Pages
 from schemas.ProjectName import ProjectName
 
 import analysis
-
+db = {}
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
@@ -628,6 +629,8 @@ def ingest():
             }
 
         logger.info(f"[{request_id}] Request completed successfully")
+        global db
+        db.update({ repo_name: result_dict })
         return jsonify(result_dict)
 
     except Exception as e:
@@ -637,6 +640,19 @@ def ingest():
         if os.path.isdir(clone_dir):
             shutil.rmtree(clone_dir)
             logger.info(f"[{request_id}] Cleaned up temporary directory: {clone_dir}")
+
+@app.route('/repos')
+def get_repos():
+    return jsonify(list(db.keys()))
+
+@app.route('/repo')
+def get_repo():
+    repo = request.args.get('name')
+
+    if repo not in list(db.keys()):
+        return jsonify({ 'msg': f'{repo} not found' })
+
+    return jsonify(db.get(repo))
 
 def get_project_name(content: str, fallback_name: str, llm):
     """Extract a human-readable project name and description."""

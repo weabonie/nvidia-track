@@ -108,13 +108,16 @@ const Home = () => {
               <div className="flex justify-center mb-6">
                 <div className="w-16 h-16 bg-[#76B900]/10 rounded-2xl flex items-center justify-center group-hover:bg-[#76B900]/20 transition-colors">
                   <svg className="w-8 h-8 text-[#76B900]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    {/* Database / Ingestion icon */}
+                    <ellipse cx="12" cy="6" rx="7" ry="2.5" strokeWidth={2} />
+                    <path d="M5 6v3c0 1.38 3.134 2.5 7 2.5s7-1.12 7-2.5V6" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M5 12v3c0 1.38 3.134 2.5 7 2.5s7-1.12 7-2.5v-3" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 </div>
               </div>
-              <h3 className="text-xl font-bold text-white mb-3 text-center">Real-Time Monitoring</h3>
+              <h3 className="text-xl font-bold text-white mb-3 text-center">Smart Ingestion</h3>
               <p className="text-gray-400 text-center leading-relaxed">
-                Track GPU utilization, memory, and temperature instantly
+                Automatically analyze repositories, code comments, and architecture notes to build structured context before writing.
               </p>
             </div>
 
@@ -126,13 +129,18 @@ const Home = () => {
               <div className="flex justify-center mb-6">
                 <div className="w-16 h-16 bg-[#76B900]/10 rounded-2xl flex items-center justify-center group-hover:bg-[#76B900]/20 transition-colors">
                   <svg className="w-8 h-8 text-[#76B900]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    {/* Flow / Planning icon */}
+                    <rect x="3" y="3" width="6" height="6" rx="1.5" strokeWidth={2} />
+                    <rect x="15" y="3" width="6" height="6" rx="1.5" strokeWidth={2} />
+                    <rect x="9" y="15" width="6" height="6" rx="1.5" strokeWidth={2} />
+                    <path d="M6 9v6h6" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M18 9v6h-6" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 </div>
               </div>
-              <h3 className="text-xl font-bold text-white mb-3 text-center">AI-Powered Insights</h3>
+              <h3 className="text-xl font-bold text-white mb-3 text-center">Autonomous Planning</h3>
               <p className="text-gray-400 text-center leading-relaxed">
-                Get intelligent recommendations to maximize efficiency
+                Agents map the documentation hierarchy, ensuring logical flow and linking related sections seamlessly.
               </p>
             </div>
 
@@ -144,13 +152,16 @@ const Home = () => {
               <div className="flex justify-center mb-6">
                 <div className="w-16 h-16 bg-[#76B900]/10 rounded-2xl flex items-center justify-center group-hover:bg-[#76B900]/20 transition-colors">
                   <svg className="w-8 h-8 text-[#76B900]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    {/* Upload / Publish icon */}
+                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M17 8l-5-5-5 5" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M12 3v12" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 </div>
               </div>
-              <h3 className="text-xl font-bold text-white mb-3 text-center">Enterprise Security</h3>
+              <h3 className="text-xl font-bold text-white mb-3 text-center">Fast Publishing</h3>
               <p className="text-gray-400 text-center leading-relaxed">
-                Bank-grade encryption and compliance for peace of mind
+                Deploys directly to Docusaurus with pre-built navigation, visuals, and styling. Ready for production.
               </p>
             </div>
           </div>

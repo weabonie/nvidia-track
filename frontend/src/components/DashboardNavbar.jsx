@@ -38,7 +38,7 @@ const DashboardNavbar = () => {
         try {
           setIngestLoading(true);
           setIngestError(null);
-          const resp = await axios.get("http://204.52.27.251:3333/ingest", {
+          const resp = await axios.get("https://apihackutd.siru.dev/ingest", {
             params: { repo_url: githubUrl.trim() },
             signal: controller.signal,
           });

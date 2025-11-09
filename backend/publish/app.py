@@ -289,8 +289,11 @@ def fix_mdx_curly_braces(content: str) -> str:
             result.append(line)
             continue
 
-        # Remove any MDX expression blocks like {id}, { id }, {anything}
+        # CRITICAL: Remove ALL curly braces - both matched pairs AND orphaned ones
+        # First remove matched pairs {anything}
         modified_line = re.sub(r"\{\s*[^}]*\s*\}", "", line)
+        # Then remove any remaining orphaned { or } characters
+        modified_line = modified_line.replace('{', '').replace('}', '')
 
         # Replace :param patterns with PARAM name (drop the colon)
         # Match patterns like :id, :userId, :projectId etc

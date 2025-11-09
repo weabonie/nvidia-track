@@ -280,14 +280,14 @@ const DashboardNavbar = () => {
           <div className="md:hidden border-t border-gray-800 py-4 animate-slide-down">
             <div className="flex flex-col gap-1">
               <Link 
-                to="/projects" 
+                to="/dashboard" 
                 className="px-3 py-2 text-sm text-white font-medium rounded-md hover:bg-gray-900"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Overview
               </Link>
               <Link 
-                to="/projects/integrations" 
+                to="/dashboard/integrations" 
                 className="px-3 py-2 text-sm text-gray-400 hover:text-white rounded-md hover:bg-gray-900"
                 onClick={() => setIsMenuOpen(false)}
               >

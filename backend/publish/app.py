@@ -74,11 +74,17 @@ CRITICAL RULES:
 2. All files MUST have YAML front matter with id, title, and sidebar_position
 3. File paths must be docs/SLUG.md where SLUG is lowercase-with-dashes
 4. Create comprehensive, well-structured documentation content
-5. NEVER USE CURLY BRACES for parameters - use :parameter or [parameter] syntax instead
-   Example: /api/users/:id or /api/users/[id] (NOT /api/users/{id})
-6. This is MDX format - curly braces cause React errors
-7. CODE BLOCKS: Always close code blocks properly with three backticks
-8. Never use malformed code fences
+5. ABSOLUTELY NO SPECIAL CHARACTERS for placeholders - MDX/React interprets them as code
+   - For API paths with parameters, use UPPERCASE: /api/users/USER_ID or /api/users/USERID
+   - For placeholders: use UPPERCASE_WORDS like PROJECT_ID, USER_NAME, etc.
+   - NEVER use: {}, <>, :, or any symbols - ONLY letters, numbers, underscore, hyphen
+6. CODE BLOCKS: CRITICAL FORMATTING
+   - Use EXACTLY three backticks (```) at start of code block on its own line
+   - NEVER write "code```" or put ANY text before the backticks
+   - Format: ```language on one line, then code, then ``` on its own line
+   - Always close code blocks properly with three backticks on their own line
+7. Never use malformed code fences
+8. Keep it simple - use plain text and UPPERCASE for placeholders
 
 JSON SCHEMA (FOLLOW EXACTLY):
 {
@@ -234,9 +240,11 @@ export default {{
 
 def fix_mdx_curly_braces(content: str) -> str:
     """
-    Escape single curly braces in MDX content to prevent React errors.
-    MDX treats {variable} as JavaScript expressions, so we need {{variable}} for literals.
-    This function preserves code blocks, fixes malformed code fences, and escapes braces outside code blocks.
+    SANITIZE MDX content to prevent React/JSX parsing errors.
+    - Remove ALL curly braces (MDX treats them as JS expressions)
+    - Replace angle brackets that look like HTML tags
+    - Replace :param syntax with safe UPPERCASE
+    - Preserves code blocks and frontmatter.
     """
     lines = content.split('\n')
     result = []
@@ -257,6 +265,13 @@ def fix_mdx_curly_braces(content: str) -> str:
         
         # Fix malformed code fences - check for ``' or other common issues
         stripped = line.strip()
+        
+        # CRITICAL: Fix "code```" pattern (common LLM mistake)
+        if 'code```' in stripped:
+            logger.warning(f"Line {i+1}: Found 'code```' pattern, fixing to '```'")
+            line = stripped.replace('code```', '```')
+            stripped = line.strip()
+        
         if stripped.startswith('``') and not stripped.startswith('```'):
             # Likely a malformed code fence like ``' or ``
             logger.warning(f"Line {i+1}: Found malformed code fence '{stripped}', fixing to '```'")
@@ -273,14 +288,18 @@ def fix_mdx_curly_braces(content: str) -> str:
         if in_code_block or in_frontmatter:
             result.append(line)
             continue
-        
-        # Escape single curly braces outside of code blocks
-        # Replace {anything} with {{anything}} but avoid {{ and }} already escaped
-        modified_line = line
-        # Use regex to find single curly braces and escape them
-        modified_line = re.sub(r'(?<!\{)\{(?!\{)', '{{', modified_line)  # { -> {{
-        modified_line = re.sub(r'(?<!\})\}(?!\})', '}}', modified_line)  # } -> }}
-        
+
+        # Remove any MDX expression blocks like {id}, { id }, {anything}
+        modified_line = re.sub(r"\{\s*[^}]*\s*\}", "", line)
+
+        # Replace :param patterns with PARAM name (drop the colon)
+        # Match patterns like :id, :userId, :projectId etc
+        modified_line = re.sub(r':([a-zA-Z_][a-zA-Z0-9_]*)', r'\1', modified_line)
+
+        # Replace <placeholder> patterns with PLACEHOLDER (MDX thinks these are HTML tags!)
+        # Match patterns like <user-id>, <id>, etc
+        modified_line = re.sub(r'<([a-zA-Z][a-zA-Z0-9_-]*)>', r'\1', modified_line)
+
         result.append(modified_line)
     
     # Check if we ended with an unclosed code block
@@ -355,11 +374,21 @@ def write_docker(site_dir: Path):
     (site_dir / "Dockerfile").write_text("""\
 FROM node:18-alpine
 WORKDIR /site
+
+# Install dependencies first (better layer caching)
 COPY package.json package-lock.json* yarn.lock* pnpm-lock.yaml* .npmrc* ./
-RUN npm ci || npm i
+RUN npm ci || npm i && npm i -g http-server
+
+# Copy site source
 COPY . .
+
+# Ensure any previous caches are gone and build static site
+RUN rm -rf .docusaurus node_modules/.cache || true \
+ && npx docusaurus build
+
 EXPOSE 3000
-CMD ["npx", "docusaurus", "start", "--host", "0.0.0.0", "--port", "3000"]
+# Serve the static build with a simple static server (no config needed at runtime)
+CMD ["http-server", "build", "-p", "3000", "-a", "0.0.0.0"]
 """, encoding="utf-8")
 
     (site_dir / "docker-compose.yml").write_text("""\
@@ -383,6 +412,14 @@ def docker_up(site_dir: Path, image: str, container: str, port: int):
     
     # Build with --no-cache to ensure completely fresh build (no cached layers)
     logger.info(f"Building fresh Docker image with --no-cache...")
+    # Remove any local build caches before building
+    for cache_dir in [site_dir / '.docusaurus', site_dir / 'node_modules' / '.cache']:
+        if cache_dir.exists():
+            try:
+                shutil.rmtree(cache_dir)
+                logger.info(f"Removed local cache directory: {cache_dir}")
+            except Exception as cache_err:
+                logger.warning(f"Failed to remove cache {cache_dir}: {cache_err}")
     subprocess.check_call([
         "docker", "build",
         "--no-cache",

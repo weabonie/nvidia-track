@@ -91,10 +91,10 @@ const Home = () => {
           {/* Section Header */}
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">
-              Everything you need to <span className="text-[#76B900]">optimize</span>
+              Save <span className="text-[#76B900]">hours</span> of manual writing.
             </h2>
             <p className="text-lg text-gray-400 max-w-2xl mx-auto">
-              Powerful features designed for developers who demand performance
+              Powered by multiple Nemotron models, each agent specializes in technical writing, diagram explanation, and user guidance.
             </p>
           </div>
 

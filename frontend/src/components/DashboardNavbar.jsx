@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import axios from "axios";
 import { Link } from "react-router-dom";
 
 const DashboardNavbar = () => {
@@ -28,12 +29,71 @@ const DashboardNavbar = () => {
   const handleDeploy = (e) => {
     e.preventDefault();
     if (githubUrl.trim()) {
-      // Handle deployment logic here
-      console.log("Deploying:", githubUrl);
-      setShowDeployModal(false);
-      setGithubUrl("");
+      // Call backend ingest endpoint to retrieve project metadata
+      const controller = new AbortController();
+      setIngestAbortController(controller);
+      setDeployStartTime(Date.now());
+      setIngestCompleted(false);
+      (async () => {
+        try {
+          setIngestLoading(true);
+          setIngestError(null);
+          const resp = await axios.get("http://204.52.27.251:3333/ingest", {
+            params: { repo_url: githubUrl.trim() },
+            signal: controller.signal,
+          });
+          console.log("Ingest response:", resp.data);
+          setIngestData(resp.data);
+          setIngestCompleted(true);
+          // clear the input so user can add another later
+          setGithubUrl("");
+        } catch (err) {
+          console.error("Ingest failed", err);
+          const message = err?.name === 'CanceledError' || err?.code === 'ERR_CANCELED' ? 'Deploy cancelled' : (err?.message || "Failed to ingest repository");
+          setIngestError(message);
+        } finally {
+          setIngestLoading(false);
+          setIngestAbortController(null);
+        }
+      })();
     }
   };
+
+
+  // Ingest state
+  const [ingestLoading, setIngestLoading] = useState(false);
+  const [ingestData, setIngestData] = useState(null);
+  const [ingestError, setIngestError] = useState(null);
+  const [ingestAbortController, setIngestAbortController] = useState(null);
+  const [ingestCompleted, setIngestCompleted] = useState(false);
+  const [deployStartTime, setDeployStartTime] = useState(null);
+  const [elapsedMs, setElapsedMs] = useState(0);
+
+  const cancelDeploy = () => {
+    if (ingestAbortController) {
+      try {
+        ingestAbortController.abort();
+      } catch (e) {
+        // ignore
+      }
+    }
+    setIngestLoading(false);
+    setIngestAbortController(null);
+    setIngestError('Deploy cancelled');
+    setIngestCompleted(false);
+  }
+
+  // update elapsed time while loading
+  useEffect(() => {
+    if (!ingestLoading) {
+      setElapsedMs(0);
+      return;
+    }
+    const id = setInterval(() => {
+      setElapsedMs(Date.now() - (deployStartTime || Date.now()));
+    }, 1000);
+    return () => clearInterval(id);
+  }, [ingestLoading, deployStartTime]);
 
   return (
     <nav className="sticky top-0 z-50 bg-black border-b border-gray-800/50">
@@ -352,14 +412,14 @@ const DashboardNavbar = () => {
 
       {/* Deploy Modal */}
       {showDeployModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/80 backdrop-blur-sm animate-fade-in" onClick={() => setShowDeployModal(false)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/80 backdrop-blur-sm animate-fade-in" onClick={() => { if (!ingestLoading) setShowDeployModal(false); else { cancelDeploy(); setShowDeployModal(false); } }}>
           <div className="w-full max-w-lg bg-[#0a0a0a] border border-gray-800 rounded-md shadow-2xl animate-scale-in" onClick={(e) => e.stopPropagation()}>
             {/* Header */}
             <div className="px-6 py-4 border-b border-gray-800">
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-white">Deploy New Project</h2>
                 <button 
-                  onClick={() => setShowDeployModal(false)}
+                  onClick={() => { if (!ingestLoading) { setShowDeployModal(false); } else { cancelDeploy(); setShowDeployModal(false); } }}
                   className="text-gray-400 hover:text-white transition-colors"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -370,7 +430,8 @@ const DashboardNavbar = () => {
             </div>
 
             {/* Content */}
-            <form onSubmit={handleDeploy} className="p-6">
+            {!(ingestLoading || ingestCompleted || ingestError) ? (
+              <form onSubmit={handleDeploy} className="p-6">
               <div className="mb-6">
                 <label htmlFor="github-url" className="block text-sm font-medium text-gray-300 mb-2">
                   GitHub Repository URL
@@ -423,12 +484,59 @@ const DashboardNavbar = () => {
                 <button
                   type="submit"
                   className="flex-1 px-4 py-2.5 text-sm font-medium text-black bg-white hover:bg-gray-200 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  disabled={!githubUrl.trim()}
+                  disabled={!githubUrl.trim() || ingestLoading}
                 >
-                  Deploy
+                  {ingestLoading ? "Deploying..." : "Deploy"}
                 </button>
               </div>
-            </form>
+              </form>
+            ) : (
+              <div className="p-6">
+                {ingestLoading && (
+                  <div className="flex flex-col gap-4">
+                    <div className="flex items-center gap-4">
+                      <svg className="w-6 h-6 animate-spin text-white" viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" className="opacity-20" />
+                        <path d="M22 12a10 10 0 00-10-10" stroke="currentColor" strokeWidth="4" strokeLinecap="round" className="opacity-100" />
+                      </svg>
+                      <div>
+                        <div className="text-white font-medium">Deploying project…</div>
+                        <div className="text-xs text-gray-400">Elapsed: {Math.floor(elapsedMs/1000)}s</div>
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <button onClick={() => { cancelDeploy(); setShowDeployModal(false); }} className="px-4 py-2 text-sm bg-gray-900 text-gray-300 rounded-md">Cancel</button>
+                      <button onClick={() => { /* keep modal open */ }} className="px-4 py-2 text-sm bg-transparent border border-gray-800 text-gray-300 rounded-md">Keep Open</button>
+                    </div>
+                  </div>
+                )}
+
+                {ingestCompleted && ingestData && (
+                  <div className="flex flex-col gap-4">
+                    <div className="text-white font-medium">Deploy completed successfully</div>
+                    <div className="text-sm text-gray-300">Project: <strong>{ingestData.name || ingestData['repo-name']}</strong></div>
+                    {ingestData.doc_generation?.response?.url && (
+                      <a href={ingestData.doc_generation.response.url} target="_blank" rel="noreferrer" className="text-sm text-[#76B900] underline">Open generated site</a>
+                    )}
+                    <div className="flex gap-2">
+                      <button onClick={() => setShowDeployModal(false)} className="px-4 py-2 text-sm bg-[#76B900] text-black rounded-md">Close</button>
+                      <button onClick={() => { /* TODO: navigate to project details or add to list */ setShowDeployModal(false); }} className="px-4 py-2 text-sm bg-transparent border border-gray-800 text-gray-300 rounded-md">View Project</button>
+                    </div>
+                  </div>
+                )}
+
+                {ingestError && (
+                  <div className="flex flex-col gap-4">
+                    <div className="text-white font-medium">Deploy failed</div>
+                    <div className="text-sm text-red-400">{ingestError}</div>
+                    <div className="flex gap-2">
+                      <button onClick={() => { setIngestError(null); setIngestData(null); setIngestCompleted(false); }} className="px-4 py-2 text-sm bg-gray-900 text-gray-300 rounded-md">Retry</button>
+                      <button onClick={() => setShowDeployModal(false)} className="px-4 py-2 text-sm bg-transparent border border-gray-800 text-gray-300 rounded-md">Close</button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       )}

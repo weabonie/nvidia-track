@@ -8,3 +8,4 @@ class SerializedDoc(BaseModel):
     goal: str = Field(description='Why this project was made. The end goal of this software. For instance, a web browser might want to help users navigate the web easier.')
     pages: Dict[str, str] = Field(description='Names of each page mapped to what the summary of each page would be, each summary should be a paragraph. Subsections of the project to write about')
     repo_name: str = Field(description='Name of the project itself.')
+    install_process: str = Field(description='A paragraph on the process of installing the project')

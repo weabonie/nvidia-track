@@ -1,5 +1,10 @@
-
 chromadb
 sentence-transformers
 langchain-text-splitters
 langchain-ollama
+flask
+langchain-openai
+langchain-community
+langchain-core
+GitPython
+pydantic

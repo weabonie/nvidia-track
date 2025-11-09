@@ -11,9 +11,15 @@ import uuid
 import os
 import shutil
 from glob import glob
+import git
+import json
 
 from schemas.SerializedDoc import SerializedDoc
 from schemas.Description import Description
+from schemas.Dependencies import Dependencies
+from schemas.InstallProcess import InstallProcess
+
+import analysis
 
 # Nuke on start up
 # for file in glob("tmp/*"):
@@ -24,6 +30,67 @@ if not os.path.isdir('tmp'):
     os.mkdir('tmp/')
 
 app = Flask(__name__)
+
+LANGUAGE_CONFIG = {
+    'Python': {'extensions': ['py']},
+    'JavaScript': {'extensions': ['js', 'jsx']},
+    'TypeScript': {'extensions': ['ts', 'tsx']},
+    'Java': {'extensions': ['java']},
+    'HTML': {'extensions': ['html']},
+    'CSS': {'extensions': ['css', 'scss', 'sass']},
+    'Shell': {'extensions': ['sh']},
+    'Ruby': {'extensions': ['rb']},
+    'Go': {'extensions': ['go']},
+    'Rust': {'extensions': ['rs']},
+    'PHP': {'extensions': ['php']},
+}
+
+def detect_dependencies(clone_dir):
+    detected_langs = set()
+    ext_to_lang = {f".{ext}": lang for lang, data in LANGUAGE_CONFIG.items() for ext in data['extensions']}
+
+    for root, dirs, files in os.walk(clone_dir):
+        dirs[:] = [d for d in dirs if d not in ['.git', 'node_modules', '__pycache__', 'vendor']]
+        for file in files:
+            _, ext = os.path.splitext(file)
+            if ext in ext_to_lang:
+                detected_langs.add(ext_to_lang[ext])
+
+    # Check for framework/dependency files
+    if os.path.exists(os.path.join(clone_dir, 'package.json')):
+        detected_langs.add('Node.js')
+        try:
+            with open(os.path.join(clone_dir, 'package.json'), 'r') as f:
+                package_json = json.load(f)
+                all_deps = {**package_json.get('dependencies', {}), **package_json.get('devDependencies', {})}
+                if 'react' in all_deps:
+                    detected_langs.add('React')
+                if 'vue' in all_deps:
+                    detected_langs.add('Vue.js')
+                if '@angular/core' in all_deps:
+                    detected_langs.add('Angular')
+                if 'next' in all_deps:
+                    detected_langs.add('Next.js')
+                if 'svelte' in all_deps:
+                    detected_langs.add('Svelte')
+        except json.JSONDecodeError:
+            print(f"Warning: Could not parse package.json in {clone_dir}")
+
+
+    if os.path.exists(os.path.join(clone_dir, 'requirements.txt')):
+        detected_langs.add('Python')
+    if os.path.exists(os.path.join(clone_dir, 'pom.xml')) or os.path.exists(os.path.join(clone_dir, 'build.gradle')):
+        detected_langs.add('Java') # Could be Maven or Gradle
+    if os.path.exists(os.path.join(clone_dir, 'Gemfile')):
+        detected_langs.add('Ruby')
+    if os.path.exists(os.path.join(clone_dir, 'go.mod')):
+        detected_langs.add('Go')
+    if os.path.exists(os.path.join(clone_dir, 'Cargo.toml')):
+        detected_langs.add('Rust')
+    if os.path.exists(os.path.join(clone_dir, 'composer.json')):
+        detected_langs.add('PHP')
+
+    return sorted(list(detected_langs))
 
 @app.route('/')
 def index():
@@ -38,7 +105,6 @@ def ingest():
         api_key='HACKATHON SAVE OUR SOULS',
         temperature=0
     )
-    structured_llm = llm.with_structured_output(SerializedDoc)
 
     repo_url = request.args.get('repo_url') # NOTE: expected to come without https://
     if not repo_url:
@@ -47,13 +113,17 @@ def ingest():
     folder_name = uuid.uuid4()
     clone_dir = f'tmp/{folder_name}'
     
-    os.system(f'git clone --depth 1 https://{repo_url} {clone_dir}')
-
-    if not os.path.isdir(clone_dir):
+    try:
+        git.Repo.clone_from(f'https://{repo_url}', clone_dir, depth=1)
+    except Exception as e:
+        print(f"Failed to clone repo: {e}")
         return jsonify({ 'error': 'Failed to clone repository.' }), 500
 
     try:
-        # Scan *.md files recursively
+        # 1. Detect dependencies
+        dependencies = detect_dependencies(clone_dir)
+
+        # 2. Get description from READMEs
         md_content = ''
         for file_path in glob(f'{clone_dir}/**/*.md', recursive=True):
             if os.path.isfile(file_path):
@@ -63,79 +133,38 @@ def ingest():
                         md_content += f.read() + "\n"
                 except Exception as e:
                     print(f"Could not read {file_path}: {e}")
-
-        description = get_description(content=md_content, llm=llm)
-
-        # Code analysis
-        documents = []
-        for file_path in glob(f'{clone_dir}/**', recursive=True):
-            if '.git/' in file_path or '__pycache__' in file_path or 'node_modules/' in file_path:
-                continue
-            
-            if os.path.isfile(file_path):
-                try:
-                    with open(file_path, 'r', encoding='utf-8') as f:
-                        f.read(1024)
-                        f.seek(0)
-                        documents.append(f.read())
-                except (UnicodeDecodeError, IOError):
-                    print(f"Skipping non-text or unreadable file: {file_path}")
-                except Exception as e:
-                    print(f"Could not read {file_path}: {e}")
-
-        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
-        texts = text_splitter.create_documents(documents)
         
-        embedding_function = OllamaEmbeddings(model="nomic-embed-text", base_url="http://204.52.27.251:11434")
-        chroma_client = chromadb.HttpClient(host='204.52.27.251', port=8000)
-        vectorstore = Chroma.from_documents(texts, embedding_function, client=chroma_client)
-        retriever = vectorstore.as_retriever()
+        description_obj = get_description(content=md_content, llm=llm)
+        goal = description_obj.description if description_obj else "Could not determine project goal."
 
-        template = """Answer the question based only on the following context:
-        {context}
+        # 3. Get repo name
+        repo_name = repo_url.split('/')[-1]
 
-        Question: {question}
-        """
-        prompt = ChatPromptTemplate.from_template(template)
+        # 4. Get pages (placeholder)
+        pages = {"summary": "This is an auto-generated summary."}
 
-        msgs = [
-            ('system', 'You are a senior software engineer. Analyze the following code and provide a structured analysis. The pages directive should be the names of the pages needed to explain the project in its detail. The description is what the code does in a short descriptive sentence. Context: {context}'),
-            ('human', 'Question: {question}')
-        ]
+        install_process = get_install_process(str(dependencies), llm)
 
-        # Check for deps
-        dep_content = ''
-        req_path = f'{clone_dir}/requirements.txt'
-        if os.path.isfile(req_path): # Python
-            with open(req_path, 'r', encoding='utf-8') as f:
-                dep_content += f'####{req_path}\n'
-                dep_content += f.read() + "\n" 
-                msgs.append(('human', f'dependencies file: {dep_content}'))
+        # The call to the deeper analysis function is preserved but its output is not
+        # currently used in the final SerializedDoc. This can be integrated later.
+        # try:
+        #     full_repo_url = f"https://{repo_url}"
+        #     graph = analysis.analyze_repo(full_repo_url, llm)
+        #     print("Graph analysis successful.")
+        # except Exception as e:
+        #     print(f"Graph analysis failed: {e}")
 
-        pkg_path = f'{clone_dir}/package.json'
-        if os.path.isfile(pkg_path): # TypeScript / JavaScript
-            with open(pkg_path, 'r', encoding='utf-8') as f:
-                dep_content += f'####{pkg_path}\n'
-                dep_content += f.read() + "\n" 
-                msgs.append(('human', f'dependencies file: {dep_content}'))
 
-        prompt = ChatPromptTemplate.from_messages(msgs)
-
-        chain = (
-            {"context": retriever, "question": RunnablePassthrough()}
-            | prompt
-            | structured_llm
+        # 5. Construct the result
+        result = SerializedDoc(
+            dependencies=dependencies,
+            goal=goal,
+            pages=pages,
+            repo_name=repo_name,
+            install_process=install_process
         )
 
-        response = chain.invoke("Analyze the provided code and generate a structured analysis.")
-
-        print("--- Successfully Received Pydantic Object ---")
-        print(f"Type of response: {type(response)}")
-        print("\n")
-        print(response.model_dump_json(indent=2))
-        print(f"Libraries: {response.dependencies}")
-
-        return jsonify(response.model_dump_json())
+        return jsonify(result.dict())
 
     except Exception as e:
         print(f"--- Error ---")
@@ -155,7 +184,34 @@ def get_description(content: str, llm):
     chain = prompt | structured_llm
     response = chain.invoke({ 'content': content})
 
-    return response.description
+    return response
+
+def get_deps(content: str, llm) -> list:
+    structured_llm = llm.with_structured_output(Dependencies)
+    prompt = ChatPromptTemplate.from_messages([
+        ('system', 'You are a senior software engineer. Your job is to compile all dependencies needed from the overview of the projects functions given'),
+        ('human', 'Overview: {overview}')
+    ])
+    chain = prompt | structured_llm
+    response = chain.invoke({ 'overview': content })
+
+    return response
+
+def get_install_process(content: str, llm) -> str:
+    if not content or content == '[]':
+        return "No specific installation steps identified. Please refer to the project's documentation."
+    
+    try:
+        structured_llm = llm.with_structured_output(InstallProcess)
+        prompt = ChatPromptTemplate.from_messages([
+            ('system', 'You are a senior software engineer who loves writing. Your job is to write an install process for the given dependencies. You do not need to mention installing standard libraries. But you must require mentioning installing the toolchain for the languages it uses. For instance, if the project uses JavaScript it may need NPM.'),
+            ('human', 'Dependencies: {content}')
+        ])
+        chain = prompt | structured_llm
+        response = chain.invoke({ 'content': content })
+        return response.install_process
+    except Exception as e:
+        print(f"Could not generate install process via LLM: {e}")
+        return "Could not automatically generate installation steps. Please refer to the project's documentation."
 
 app.run(debug=True, host='0.0.0.0', port=3333)
-

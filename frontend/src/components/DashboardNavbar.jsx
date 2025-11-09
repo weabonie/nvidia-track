@@ -38,7 +38,7 @@ const DashboardNavbar = () => {
         try {
           setIngestLoading(true);
           setIngestError(null);
-          const resp = await axios.get("http://204.52.27.251:3333/ingest", {
+          const resp = await axios.get("https://apihackutd.siru.dev/ingest", {
             params: { repo_url: githubUrl.trim() },
             signal: controller.signal,
           });
@@ -107,7 +107,7 @@ const DashboardNavbar = () => {
                 <span className="text-black font-bold text-sm">N</span>
               </div>
               <span className="text-sm font-medium text-white hidden sm:block">
-                NVIDIA Track
+                AutoDoc
               </span>
             </Link>
 
@@ -466,7 +466,7 @@ const DashboardNavbar = () => {
                   <div>
                     <p className="text-sm text-white font-medium mb-1">Auto-detect Framework</p>
                     <p className="text-xs text-gray-400">
-                      NVIDIA Track will automatically detect your framework and configure build settings
+                      AutoDoc will automatically detect your framework and configure build settings
                     </p>
                   </div>
                 </div>

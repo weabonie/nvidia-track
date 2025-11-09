@@ -672,19 +672,23 @@ def write_docker(site_dir: Path):
 FROM node:18-alpine
 WORKDIR /site
 
-# Install dependencies first (better layer caching)
-COPY package.json package-lock.json* yarn.lock* pnpm-lock.yaml* .npmrc* ./
-RUN npm ci || npm i && npm i -g http-server
+# Install http-server globally first
+RUN npm install -g http-server
+
+# Copy package files
+COPY package.json ./
+
+# Install dependencies (no lockfile, so use npm install)
+RUN npm install --legacy-peer-deps
 
 # Copy site source
 COPY . .
 
-# Ensure any previous caches are gone and build static site
-RUN rm -rf .docusaurus node_modules/.cache || true \
- && npx docusaurus build
+# Build static site
+RUN npx docusaurus build
 
 EXPOSE 3000
-# Serve the static build with a simple static server (no config needed at runtime)
+# Serve the static build
 CMD ["http-server", "build", "-p", "3000", "-a", "0.0.0.0"]
 """, encoding="utf-8")
 

@@ -6,6 +6,7 @@ import { Card } from "./ui/card";
 
 export const DeployModal = ({ isOpen, onClose }) => {
   const [githubUrl, setGithubUrl] = useState('');
+  // Overall deploying/waiting state (spinner + countdown UI)
   const [ingestLoading, setIngestLoading] = useState(false);
   const [ingestData, setIngestData] = useState(null);
   const [ingestError, setIngestError] = useState(null);
@@ -13,6 +14,10 @@ export const DeployModal = ({ isOpen, onClose }) => {
   const [ingestCompleted, setIngestCompleted] = useState(false);
   const [deployStartTime, setDeployStartTime] = useState(null);
   const [elapsedMs, setElapsedMs] = useState(0);
+  // Enforce a minimum wait time of 5 minutes (300000 ms)
+  const MIN_WAIT_MS = 5 * 60 * 1000;
+  const [minWaitUntil, setMinWaitUntil] = useState(null);
+  const [finishNow, setFinishNow] = useState(false);
 
   // Update elapsed time while loading
   useEffect(() => {
@@ -25,6 +30,23 @@ export const DeployModal = ({ isOpen, onClose }) => {
     }, 1000);
     return () => clearInterval(id);
   }, [ingestLoading, deployStartTime]);
+
+  // When backend completes, continue showing loader until min wait is over, unless user clicks Finish Now
+  useEffect(() => {
+    if (!ingestLoading || !minWaitUntil) return;
+    let rafId;
+    const tick = () => {
+      const now = Date.now();
+      const minWaitOver = now >= minWaitUntil;
+      if ((ingestCompleted && minWaitOver) || (ingestCompleted && finishNow)) {
+        setIngestLoading(false); // move to completed UI
+        return;
+      }
+      rafId = requestAnimationFrame(tick);
+    };
+    rafId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafId);
+  }, [ingestLoading, minWaitUntil, ingestCompleted, finishNow]);
 
   // Handle Escape key to close modal
   useEffect(() => {
@@ -48,6 +70,8 @@ export const DeployModal = ({ isOpen, onClose }) => {
       setIngestAbortController(controller);
       setDeployStartTime(Date.now());
       setIngestCompleted(false);
+      setFinishNow(false);
+      setMinWaitUntil(Date.now() + MIN_WAIT_MS);
       
       try {
         setIngestLoading(true);
@@ -67,8 +91,9 @@ export const DeployModal = ({ isOpen, onClose }) => {
           ? 'Deploy cancelled' 
           : (err?.message || "Failed to ingest repository");
         setIngestError(message);
-      } finally {
+        // Stop loading if there was an error
         setIngestLoading(false);
+      } finally {
         setIngestAbortController(null);
       }
     }
@@ -86,6 +111,8 @@ export const DeployModal = ({ isOpen, onClose }) => {
     setIngestAbortController(null);
     setIngestError('Deploy cancelled');
     setIngestCompleted(false);
+    setMinWaitUntil(null);
+    setFinishNow(false);
   };
 
   const handleClose = () => {
@@ -96,6 +123,8 @@ export const DeployModal = ({ isOpen, onClose }) => {
     setIngestError(null);
     setIngestData(null);
     setIngestCompleted(false);
+    setMinWaitUntil(null);
+    setFinishNow(false);
     onClose();
   };
 
@@ -208,11 +237,31 @@ export const DeployModal = ({ isOpen, onClose }) => {
                       <div>
                         <div className="text-white font-medium">Deploying project…</div>
                         <div className="text-xs text-gray-400">Elapsed: {Math.floor(elapsedMs/1000)}s</div>
+                        {minWaitUntil && (
+                          <div className="text-xs text-gray-400">
+                            Minimum time remaining: {Math.max(0, Math.ceil((minWaitUntil - Date.now())/1000))}s
+                          </div>
+                        )}
+                        {ingestCompleted && !finishNow && (
+                          <div className="text-xs text-gray-400 mt-1">Backend finished. Finalizing deployment…</div>
+                        )}
                       </div>
                     </div>
+                    {minWaitUntil && (
+                      <div className="w-full h-2 bg-gray-800 rounded">
+                        <div
+                          className="h-2 bg-[#76B900] rounded transition-all"
+                          style={{ width: `${Math.min(100, Math.floor(((elapsedMs) / MIN_WAIT_MS) * 100))}%` }}
+                        />
+                      </div>
+                    )}
                     <div className="flex gap-2">
                       <button onClick={() => { cancelDeploy(); handleClose(); }} className="px-4 py-2 text-sm bg-gray-900 text-gray-300 rounded-md">Cancel</button>
-                      <button onClick={() => { /* keep modal open */ }} className="px-4 py-2 text-sm bg-transparent border border-gray-800 text-gray-300 rounded-md">Keep Open</button>
+                      {ingestCompleted ? (
+                        <button onClick={() => setFinishNow(true)} className="px-4 py-2 text-sm bg-transparent border border-gray-800 text-gray-300 rounded-md">Finish Now</button>
+                      ) : (
+                        <button onClick={() => { /* keep modal open */ }} className="px-4 py-2 text-sm bg-transparent border border-gray-800 text-gray-300 rounded-md">Keep Open</button>
+                      )}
                     </div>
                   </div>
                 )}

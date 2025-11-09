@@ -42,7 +42,7 @@ const router = createBrowserRouter([
         element: <Dashboard />,
       },
       {
-        path: "dashboard/projects/:id/*",
+        path: "projects/:id/*",
         element: <ProjectDetails />,
       },
       {

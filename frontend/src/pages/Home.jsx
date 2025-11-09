@@ -1,8 +1,8 @@
 const Home = () => {
   return (
-    <div className="w-full min-h-screen flex items-center">
+    <div className="w-full h-full flex items-center">
       {/* Hero Banner Section with NVIDIA Theme */}
-      <div className="relative bg-black border-y border-gray-800 py-32 md:py-40 w-full overflow-hidden">
+      <div className="relative bg-black border-b border-gray-800 py-32 md:py-40 w-full h-full flex items-center justify-center overflow-hidden">
         {/* NVIDIA-style geometric background */}
         <div className="absolute inset-0">
           {/* Dark gradient base */}

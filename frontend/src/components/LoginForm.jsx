@@ -18,7 +18,7 @@ const LoginForm = () => {
   return (
     <Card className="w-100 bg-[#1d1d1d] border-[#7b7b7b] text-white p-6 shadow-lg py-11">
       <CardHeader className="text-center">
-        <CardTitle className="text-2xl">Login to your account</CardTitle>
+        <CardTitle className="text-2xl font-medium">Login to your account</CardTitle>
         {/* <CardDescription>
           Enter your email below to login to your account
         </CardDescription> */}
@@ -62,11 +62,11 @@ const LoginForm = () => {
           Login with Google
         </Button> */}
 
-        <span className="font-medium mr-auto inline-block">
+        <span className="mr-auto inline-block">
           Don't have an account?{" "}
           <a
             href="#"
-            className="text-nvidia underline-offset-4 hover:underline"
+            className="font-medium text-nvidia underline-offset-4 hover:underline"
           >
             Register
           </a>

@@ -3,9 +3,6 @@ const Home = () => {
     <div className="w-full">
       {/* Hero Banner Section */}
       <div className="relative bg-gradient-to-br from-gray-900 via-black to-gray-900 border-y border-gray-800 py-20 mb-16">
-        {/* Subtle grid pattern overlay */}
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:50px_50px] [mask-image:radial-gradient(ellipse_at_center,black_50%,transparent_100%)]"></div>
-        
         <div className="relative max-w-4xl mx-auto text-center px-4">
           <h1
             className="text-6xl md:text-7xl font-bold text-[#76B900] mb-6 tracking-tight animate-fade-in-up opacity-0"

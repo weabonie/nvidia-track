@@ -197,12 +197,12 @@ const Home = () => {
                 >
                   Get Started Now
                 </Link>
-                <a 
+                {/* <a 
                   href="mailto:contact@nvidiatrack.com" 
                   className="text-gray-300 px-12 py-4 rounded-lg font-semibold border-2 border-gray-700 hover:border-[#76B900] hover:text-white transition-all duration-300"
                 >
                   Contact Sales
-                </a>
+                </a> */}
               </div>
               <p className="text-sm text-gray-500">
                 No credit card required • Free 14-day trial • Cancel anytime

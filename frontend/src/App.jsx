@@ -11,6 +11,7 @@ import Layout from './components/Layout'
 import LoginPage from './pages/LoginPage'
 import Dashboard from "./pages/Dashboard";
 import ProjectLayout from "./components/ProjectsLayout";
+import ProjectDetails from "./pages/ProjectDetails";
 
 // import Login from './pages/auth/Login';
 // import Register from './pages/auth/Register';
@@ -48,6 +49,10 @@ const router = createBrowserRouter([
       {
         index: true, // This makes Home the default child route for '/'
         element: <Dashboard />,
+      },
+      {
+        path: ":id",
+        element: <ProjectDetails />,
       },
       // {
       //   path: 'about',

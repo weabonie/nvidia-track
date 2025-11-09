@@ -5,35 +5,20 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <nav className="bg-black text-white border-b border-gray-800 animate-slide-down">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <nav className="bg-black/95 backdrop-blur-sm text-white border-b border-gray-800/50 sticky top-0 z-50 animate-slide-down">
+      <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
-          {/* Logo */}
-          <div className="flex-shrink-0">
-            <a href="/" className="text-2xl font-bold tracking-tight text-[#76B900] hover:text-[#5d9100] transition-colors">
-              NVIDIA Track
-            </a>
-          </div>
+          {/* Logo - Simplified */}
+          <Link to="/" className="text-2xl font-bold text-[#76B900] hover:text-[#5d9100] transition-colors">
+            NVIDIA Track
+          </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex space-x-10">
-            <a href="#home" className="text-sm font-medium hover:text-[#76B900] transition-colors uppercase tracking-wide">
-              Home
-            </a>
-            <a href="#features" className="text-sm font-medium hover:text-[#76B900] transition-colors uppercase tracking-wide">
-              Features
-            </a>
-            <a href="#about" className="text-sm font-medium hover:text-[#76B900] transition-colors uppercase tracking-wide">
-              About
-            </a>
-            <a href="#contact" className="text-sm font-medium hover:text-[#76B900] transition-colors uppercase tracking-wide">
-              Contact
-            </a>
-          </div>
-
-          {/* CTA Button */}
+          {/* Desktop CTA Button - Single Focus */}
           <div className="hidden md:block">
-            <Link to="/login" className="border-nvidia text-white px-8 py-2.5 rounded-lg font-semibold hover:bg-nvidia hover:text-white transition-all transform hover:scale-105 border-2 border-[#76B900] hover:border-[#5d9100]">
+            <Link 
+              to="/login" 
+              className="bg-[#76B900] text-white px-8 py-3 rounded-lg font-semibold hover:bg-[#5d9100] transition-all transform hover:scale-105 shadow-lg"
+            >
               Get Started
             </Link>
           </div>
@@ -42,10 +27,11 @@ const Navbar = () => {
           <div className="md:hidden">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-white hover:text-gray-300 focus:outline-none"
+              className="text-white hover:text-[#76B900] focus:outline-none transition-colors"
+              aria-label="Toggle menu"
             >
               <svg
-                className="h-7 w-7"
+                className="h-6 w-6"
                 fill="none"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -63,26 +49,16 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* Mobile Menu */}
+        {/* Mobile Menu - Minimal */}
         {isMenuOpen && (
-          <div className="md:hidden pb-6 pt-2 border-t border-gray-800">
-            <div className="flex flex-col space-y-4">
-              <a href="#home" className="text-sm font-medium hover:text-[#76B900] transition-colors uppercase tracking-wide">
-                Home
-              </a>
-              <a href="#features" className="text-sm font-medium hover:text-[#76B900] transition-colors uppercase tracking-wide">
-                Features
-              </a>
-              <a href="#about" className="text-sm font-medium hover:text-[#76B900] transition-colors uppercase tracking-wide">
-                About
-              </a>
-              <a href="#contact" className="text-sm font-medium hover:text-[#76B900] transition-colors uppercase tracking-wide">
-                Contact
-              </a>
-              <button className="bg-[#76B900] text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-[#5d9100] hover:text-white transition-all w-full mt-2 border-2 border-[#76B900] hover:border-[#5d9100]">
-                Get Started
-              </button>
-            </div>
+          <div className="md:hidden pb-6 pt-2 animate-fade-in">
+            <Link 
+              to="/login" 
+              className="block bg-[#76B900] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#5d9100] transition-all text-center"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Get Started
+            </Link>
           </div>
         )}
       </div>

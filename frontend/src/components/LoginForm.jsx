@@ -13,10 +13,27 @@ import {
 
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 const LoginForm = () => {
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const navigate = useNavigate();
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    setIsLoggingIn(true);
+    
+    // Wait for animation to complete before navigating
+    setTimeout(() => {
+      navigate('/projects');
+    }, 800);
+  };
+
   return (
-    <Card className="w-100 bg-[#1d1d1d] border-[#7b7b7b] text-white p-6 shadow-lg py-11">
+    <Card className={`w-100 bg-[#1d1d1d] border-[#7b7b7b] text-white p-6 shadow-lg py-11 transition-all duration-800 ${
+      isLoggingIn ? 'opacity-0 scale-95' : 'opacity-100 scale-100'
+    }`}>
       <CardHeader className="text-center">
         <CardTitle className="text-2xl font-medium">Login to your account</CardTitle>
         {/* <CardDescription>
@@ -55,9 +72,25 @@ const LoginForm = () => {
         </form>
       </CardContent>
       <CardFooter className="flex-col gap-4">
-        <Button type="submit" className="bg-nvidia hover:bg-nvidia-hover text-black w-full h-10">
-          Login
-        </Button>
+        <button
+          onClick={handleLogin}
+          className={`bg-nvidia flex justify-center items-center hover:bg-nvidia-hover text-black w-full h-10 font-medium rounded transition-all duration-300 ${
+            isLoggingIn ? 'scale-95 opacity-70' : 'scale-100 opacity-100'
+          }`}
+          disabled={isLoggingIn}
+        >
+          {isLoggingIn ? (
+            <span className="flex items-center gap-2">
+              <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Logging in...
+            </span>
+          ) : (
+            'Login'
+          )}
+        </button>
         {/* <Button variant="outline" className="w-full">
           Login with Google
         </Button> */}

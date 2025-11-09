@@ -78,14 +78,20 @@ const sampleProjects = [
 
 const Dashboard = () => {
     return (
-        <div className="p-12">
-            <div className="flex items-center justify-between mb-6">
+        <div className="p-12 animate-fade-in">
+            <div className="flex items-center justify-between mb-6 animate-slide-down opacity-0" style={{ animationDelay: "0.1s" }}>
                 <h1 className="text-2xl text-nvidia font-semibold">Projects</h1>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {sampleProjects.map((p) => (
-                    <ProjectCard key={p.id} project={p} />
+                {sampleProjects.map((p, index) => (
+                    <div 
+                        key={p.id} 
+                        className="animate-scale-in opacity-0" 
+                        style={{ animationDelay: `${0.2 + (index * 0.1)}s` }}
+                    >
+                        <ProjectCard project={p} />
+                    </div>
                 ))}
             </div>
         </div>
